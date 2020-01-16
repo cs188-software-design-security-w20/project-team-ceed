@@ -63,11 +63,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Validate the email and password inputted by the user
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    "Please enter your email",
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    "Please enter your password",
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
         // Show the progress bar
@@ -78,10 +86,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "User registered successfully.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(
+                                    MainActivity.this,
+                                    "User registered successfully.",
+                                    Toast.LENGTH_SHORT
+                            ).show();
                         }
                         else {
-                            Toast.makeText(MainActivity.this, "Failed to register user, please try again.", Toast.LENGTH_SHORT).show();
+                            if (task.getException() != null) {
+                                Toast.makeText(
+                                        MainActivity.this,
+                                        task.getException().getMessage() + " " + "Please try again.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                            else {
+                                Toast.makeText(
+                                        MainActivity.this,
+                                        "Could not create user." + " " + "Please try again.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+
                         }
                         progressBarRegister.setVisibility(View.GONE);
                     }
