@@ -27,17 +27,17 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class SignUpFragment extends Fragment implements View.OnClickListener {
 
-    private Context context;
-    private NavController navController;
-    private Button buttonRegister;
-    private EditText editTextEmail;
-    private EditText editTextPassword;
-    private TextView textViewLogin;
+    private Context _context;
+    private NavController _navController;
+    private Button _buttonRegister;
+    private EditText _editTextEmail;
+    private EditText _editTextPassword;
+    private TextView _textViewLogin;
 
-    private ProgressBar progressBarRegister;
+    private ProgressBar _progressBarRegister;
 
 
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth _firebaseAuth;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -46,7 +46,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
+        this._context = context;
     }
 
     @Override
@@ -62,39 +62,39 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                               Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        buttonRegister = (Button) view.findViewById(R.id.buttonRegister);
-        editTextEmail = (EditText) view.findViewById(R.id.editTextEmail);
-        editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
-        textViewLogin = (TextView) view.findViewById(R.id.textViewLogin);
+        _buttonRegister = (Button) view.findViewById(R.id.buttonRegister);
+        _editTextEmail = (EditText) view.findViewById(R.id.editTextEmail);
+        _editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
+        _textViewLogin = (TextView) view.findViewById(R.id.textViewLogin);
 
-        buttonRegister.setOnClickListener(this);
-        textViewLogin.setOnClickListener(this);
-        progressBarRegister = new ProgressBar(context);
+        _buttonRegister.setOnClickListener(this);
+        _textViewLogin.setOnClickListener(this);
+        _progressBarRegister = new ProgressBar(_context);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        _firebaseAuth = FirebaseAuth.getInstance();
 
-        navController = Navigation.findNavController(view);
+        _navController = Navigation.findNavController(view);
 
     }
 
     @Override
     public void onClick(View view) {
-        if (view == buttonRegister) {
+        if (view == _buttonRegister) {
             registerUser();
-        } else if (view == textViewLogin) {
+        } else if (view == _textViewLogin) {
             // open sign-in activity
-            navController.navigate(R.id.action_signUpFragment_to_logInFragment);
+            _navController.navigate(R.id.action_signUpFragment_to_logInFragment);
         }
     }
 
     private void registerUser() {
-        String email = editTextEmail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
+        String email = _editTextEmail.getText().toString().trim();
+        String password = _editTextPassword.getText().toString().trim();
 
         // Validate the email and password inputted by the user
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(
-                    context,
+                    _context,
                     "Please enter your email",
                     Toast.LENGTH_SHORT
             ).show();
@@ -102,44 +102,44 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         }
         if (TextUtils.isEmpty(password)) {
             Toast.makeText(
-                    context,
+                    _context,
                     "Please enter your password",
                     Toast.LENGTH_SHORT
             ).show();
             return;
         }
         // Show the progress bar
-        progressBarRegister.setVisibility(View.VISIBLE);
+        _progressBarRegister.setVisibility(View.VISIBLE);
 
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener((Activity) context,
+        _firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener((Activity) _context,
                         new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(
-                                            context,
+                                            _context,
                                             "User registered successfully.",
                                             Toast.LENGTH_SHORT
                                     ).show();
                                 } else {
                                     if (task.getException() != null) {
                                         Toast.makeText(
-                                                context,
+                                                _context,
                                                 task.getException().getMessage()
                                                         + " " + "Please try again.",
                                                 Toast.LENGTH_SHORT
                                         ).show();
                                     } else {
                                         Toast.makeText(
-                                                context,
+                                                _context,
                                                 "Could not create user." + " " + "Please try again.",
                                                 Toast.LENGTH_SHORT
                                         ).show();
                                     }
 
                                 }
-                                progressBarRegister.setVisibility(View.GONE);
+                                _progressBarRegister.setVisibility(View.GONE);
                             }
                         });
 
