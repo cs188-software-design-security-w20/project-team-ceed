@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "875927558756-jdmool148grpu0014lukcu3ohpmdlt3d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ceed.tripster",
+            "certificate_hash": "4ae087b9f85c7ccab6a184826a3f66395e02bc29"
+          }
+        },
+        {
           "client_id": "875927558756-icoht2ac2nd9q306h3kgdqjsqujveavk.apps.googleusercontent.com",
           "client_type": 3
         }

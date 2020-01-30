@@ -1,8 +1,11 @@
 package com.ceed.tripster;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -17,6 +20,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -31,6 +37,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
 
     private ProgressBar _progressBarRegister;
 
+    private FirebaseAuth _firebaseAuth;
 
     public LogInFragment() {
         // Required empty public constructor
@@ -52,8 +59,11 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onViewCreated(View view,
-                              Bundle savedInstanceState){
+                              Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        _firebaseAuth = FirebaseAuth.getInstance();
+        _navController = Navigation.findNavController(view);
 
         _buttonLogIn = (Button) view.findViewById(R.id.buttonLogIn);
         _editTextEmailLogIn = (EditText) view.findViewById(R.id.editTextEmailLogIn);
@@ -63,8 +73,6 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         _buttonLogIn.setOnClickListener(this);
         _textViewRegister.setOnClickListener(this);
         _progressBarRegister = new ProgressBar(_context);
-
-        _navController = Navigation.findNavController(view);
 
     }
 
@@ -93,6 +101,35 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         }
         // Show the progress bar
         _progressBarRegister.setVisibility(View.VISIBLE);
+
+        //logging in the user
+        _firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener((Activity) _context,
+                        new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    startActivity(new Intent(getActivity(), MainActivity.class));
+                                } else {
+                                    if (task.getException() != null) {
+                                        Toast.makeText(
+                                                _context,
+                                                task.getException().getMessage()
+                                                        + " " + "Please try again.",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    } else {
+                                        Toast.makeText(
+                                                _context,
+                                                "Failed to login." + " " + "Please try again.",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+
+                                }
+                                _progressBarRegister.setVisibility(View.GONE);
+                            }
+                        });
 
 
     }

@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
     FirebaseAuth _firebaseAuth;
 
@@ -17,11 +17,11 @@ public class MainActivity extends AppCompatActivity {
 
         _firebaseAuth = FirebaseAuth.getInstance();
 
-        if (_firebaseAuth.getCurrentUser() == null) {
-            startActivity(new Intent(MainActivity.this, StartActivity.class));
+        if (_firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(StartActivity.this, MainActivity.class));
             finish();
         }
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_start);
     }
 }

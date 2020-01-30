@@ -36,7 +36,6 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
 
     private ProgressBar _progressBarRegister;
 
-
     private FirebaseAuth _firebaseAuth;
 
     public SignUpFragment() {
@@ -62,6 +61,9 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                               Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        _firebaseAuth = FirebaseAuth.getInstance();
+        _navController = Navigation.findNavController(view);
+
         _buttonRegister = (Button) view.findViewById(R.id.buttonRegister);
         _editTextEmail = (EditText) view.findViewById(R.id.editTextEmail);
         _editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
@@ -70,10 +72,6 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         _buttonRegister.setOnClickListener(this);
         _textViewLogin.setOnClickListener(this);
         _progressBarRegister = new ProgressBar(_context);
-
-        _firebaseAuth = FirebaseAuth.getInstance();
-
-        _navController = Navigation.findNavController(view);
 
     }
 
