@@ -10,6 +10,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(View view,
                               Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
 
         _firebaseAuth = FirebaseAuth.getInstance();
         _navController = Navigation.findNavController(view);

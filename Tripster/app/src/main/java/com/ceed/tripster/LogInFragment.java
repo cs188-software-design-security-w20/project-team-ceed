@@ -109,7 +109,9 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    startActivity(new Intent(getActivity(), MainActivity.class));
+                                    _navController.navigate(R.id.action_logInFragment_to_mainActivity);
+                                    ((Activity) _context).finish();
+                                    //startActivity(new Intent(getActivity(), MainActivity.class));
                                 } else {
                                     if (task.getException() != null) {
                                         Toast.makeText(

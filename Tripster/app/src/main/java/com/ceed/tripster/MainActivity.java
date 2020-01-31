@@ -1,6 +1,8 @@
 package com.ceed.tripster;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -73,7 +73,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Logout
             _firebaseAuth.signOut();
             // Switch to the login fragment
-            startActivity(new Intent(getActivity(), StartActivity.class));
+            _navController.navigate(R.id.action_profileFragment_to_startActivity);
+            ((Activity) _context).finish();
         }
     }
 }
