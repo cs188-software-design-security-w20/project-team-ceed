@@ -16,6 +16,10 @@
             app:popUpTo="@+id/signUpFragment"
             app:popUpToInclusive="true" />
 
+        <action
+            android:id="@+id/action_profileFragment_to_tripViewActivity"
+            app:destination="@id/tripView" />
+
     </fragment>
 
     <activity
@@ -23,4 +27,9 @@
         android:name="com.ceed.tripster.StartActivity"
         android:label="activity_start"
         tools:layout="@layout/activity_start" />
+    <activity
+        android:id="@+id/tripView"
+        android:name="com.ceed.tripster.TripViewActivity"
+        android:label="activity_trip_view"
+        tools:layout="@layout/activity_trip_view" />
 </navigation>

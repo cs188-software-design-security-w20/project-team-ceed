@@ -1,8 +1,13 @@
 package com.ceed.tripster;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,10 +15,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-public class TripView extends FragmentActivity implements OnMapReadyCallback {
+import java.util.ArrayList;
+import java.util.Arrays;
 
-    private GoogleMap mMap;
+public class TripViewActivity extends FragmentActivity
+        implements OnMapReadyCallback, ItineraryAdapter.ItemClickListener {
+
+    private GoogleMap _map;
+    private BottomSheetBehavior _bottomSheetBehavior;
+    private ItineraryAdapter _adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +35,24 @@ public class TripView extends FragmentActivity implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        RecyclerView recyclerView = findViewById(R.id.itineraryRecyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        String[] dummy = {"Hello", "World", "Goodbye"};
+        _adapter = new ItineraryAdapter(this, Arrays.asList(dummy));
+        _adapter.setClickListener(this);
+        recyclerView.setAdapter(_adapter);
+
+
+        _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
+
+
     }
 
 
@@ -37,11 +67,17 @@ public class TripView extends FragmentActivity implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        _map = googleMap;
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        _map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        _map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "You clicked " + _adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+    }
+
 }
