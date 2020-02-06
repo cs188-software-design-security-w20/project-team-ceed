@@ -11,19 +11,29 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.concurrent.Executor;
 
 
 public class LogInFragment extends Fragment implements View.OnClickListener {
@@ -34,6 +44,9 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     private EditText _editTextEmailLogIn;
     private EditText _editTextPasswordLogIn;
     private TextView _textViewRegister;
+    private CheckBox _checkboxCaptcha;
+
+    private String captchaSiteKey = "6Le8z9UUAAAAALkZDnjTgDn7Hcxw8xvuPSHmj97W";
 
     private ProgressBar _progressBarRegister;
 
@@ -69,9 +82,11 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         _editTextEmailLogIn = (EditText) view.findViewById(R.id.editTextEmailLogIn);
         _editTextPasswordLogIn = (EditText) view.findViewById(R.id.editTextPasswordLogIn);
         _textViewRegister = (TextView) view.findViewById(R.id.textViewRegister);
+        _checkboxCaptcha = (CheckBox) view.findViewById(R.id.checkBoxCaptcha);
 
         _buttonLogIn.setOnClickListener(this);
         _textViewRegister.setOnClickListener(this);
+        _checkboxCaptcha.setOnClickListener(this);
         _progressBarRegister = new ProgressBar(_context);
 
     }
@@ -83,8 +98,48 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         } else if (view == _textViewRegister) {
             // open sign-in activity
             _navController.navigate(R.id.action_logInFragment_to_signUpFragment);
+        } else if (view == _checkboxCaptcha) {
+                SafetyNet.getClient(_context).verifyWithRecaptcha(captchaSiteKey)
+                        .addOnSuccessListener((Executor) this,
+                                new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
+                                    @Override
+                                    public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
+                                        // Indicates communication with reCAPTCHA service was
+                                        // successful.
+                                        String userResponseToken = response.getTokenResult();
+                                        if (!userResponseToken.isEmpty()) {
+                                            // Validate the user response token using the
+                                            // reCAPTCHA siteverify API.
+                                        }
+                                    }
+                                })
+                        .addOnFailureListener((Executor) this, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                if (e instanceof ApiException) {
+                                    // An error occurred when communicating with the
+                                    // reCAPTCHA service. Refer to the status code to
+                                    // handle the error appropriately.
+                                    ApiException apiException = (ApiException) e;
+                                    int statusCode = apiException.getStatusCode();
+                                    Toast.makeText(
+                                            _context,
+                                            "Error: " + CommonStatusCodes
+                                                    .getStatusCodeString(statusCode),
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                } else {
+                                    // A different, unknown type of error occurred.
+                                    Toast.makeText(
+                                            _context,
+                                            "Error: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+                        });
+                }
         }
-    }
 
     private void logIn() {
         String email = _editTextEmailLogIn.getText().toString().trim();
