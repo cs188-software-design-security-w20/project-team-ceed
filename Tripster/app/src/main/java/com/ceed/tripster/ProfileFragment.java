@@ -18,6 +18,8 @@ import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -28,6 +30,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private Button _buttonTripView;
 
     private FirebaseAuth _firebaseAuth;
+    private DatabaseReference _databaseRoot;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -53,6 +56,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         _firebaseAuth = FirebaseAuth.getInstance();
+        _databaseRoot = FirebaseDatabase.getInstance().getReference();
         _navController = Navigation.findNavController(view);
 
         FirebaseUser user = _firebaseAuth.getCurrentUser();
@@ -63,7 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         _buttonTripView = (Button) view.findViewById(R.id.buttonTripView);
 
         // Set the display text
-        _textViewUserEmail.setText("Welcome " + user.getEmail());
+        _textViewUserEmail.setText("Welcome " + user.getDisplayName());
 
         // Initialize the button
         _buttonLogOut.setOnClickListener(this);

@@ -24,6 +24,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 
 public class SignUpFragment extends Fragment implements View.OnClickListener {
@@ -33,11 +39,13 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     private Button _buttonRegister;
     private EditText _editTextEmail;
     private EditText _editTextPassword;
+    private EditText _editTextDisplayName;
     private TextView _textViewLogin;
 
     private ProgressBar _progressBarRegister;
 
     private FirebaseAuth _firebaseAuth;
+    private DatabaseReference _databaseRoot;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -64,11 +72,13 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
 
 
         _firebaseAuth = FirebaseAuth.getInstance();
+        _databaseRoot = FirebaseDatabase.getInstance().getReference();
         _navController = Navigation.findNavController(view);
 
         _buttonRegister = (Button) view.findViewById(R.id.buttonRegister);
         _editTextEmail = (EditText) view.findViewById(R.id.editTextEmail);
         _editTextPassword = (EditText) view.findViewById(R.id.editTextPassword);
+        _editTextDisplayName = (EditText) view.findViewById(R.id.editTextDisplayName);
         _textViewLogin = (TextView) view.findViewById(R.id.textViewLogin);
 
         _buttonRegister.setOnClickListener(this);
@@ -88,8 +98,9 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     }
 
     private void registerUser() {
-        String email = _editTextEmail.getText().toString().trim();
+        final String email = _editTextEmail.getText().toString().trim();
         String password = _editTextPassword.getText().toString().trim();
+        final String displayName = _editTextDisplayName.getText().toString().trim();
 
         // Validate the email and password inputted by the user
         if (TextUtils.isEmpty(email)) {
@@ -108,9 +119,16 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             ).show();
             return;
         }
+        if (TextUtils.isEmpty(displayName)) {
+            Toast.makeText(
+                    _context,
+                    "Please enter your display name",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
         // Show the progress bar
         _progressBarRegister.setVisibility(View.VISIBLE);
-
         _firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener((Activity) _context,
                         new OnCompleteListener<AuthResult>() {
@@ -122,6 +140,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                                             "User registered successfully.",
                                             Toast.LENGTH_SHORT
                                     ).show();
+                                    registerSuccessful(displayName, email);
                                 } else {
                                     if (task.getException() != null) {
                                         Toast.makeText(
@@ -137,13 +156,75 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                                                 Toast.LENGTH_SHORT
                                         ).show();
                                     }
-
                                 }
                                 _progressBarRegister.setVisibility(View.GONE);
                             }
                         });
-
-
     }
 
+    private void registerSuccessful(String displayName, String email) {
+        FirebaseUser user = _firebaseAuth.getCurrentUser();
+        if (user != null) {
+            // Setting user's display name
+            UserProfileChangeRequest profileChangeRequest =
+                    new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
+            user.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d("Firebase", "Successfully set display name");
+                    }
+                    else {
+                        Log.d("Firebase", "Failed to set display name");
+                    }
+                }
+            });
+
+            // Creating a userMap
+            HashMap<String, String> newUserMap = createNewUserMap(email, displayName);
+
+            // Writing new user to database
+            writeUserToDatabase(user, newUserMap);
+        }
+    }
+
+    private HashMap<String, String> createNewUserMap(String email, String displayName) {
+        HashMap<String, String> userMap = new HashMap<>();
+        userMap.put("email", email);
+        userMap.put("display_name", displayName);
+        userMap.put("profile_photo", "");
+        Log.d("Debug", userMap.toString());
+        return userMap;
+    }
+
+    private void deleteCurrentUser(final FirebaseUser user) {
+        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("Firebase", "Successfully deleted user" + user.getUid());
+                }
+                else {
+                    Log.d("Firebase", "Failed to delete user" + user.getUid());
+                }
+            }
+        });
+    }
+
+    private void writeUserToDatabase(final FirebaseUser user, HashMap<String, String> userMap) {
+        final String userID = user.getUid();
+        _databaseRoot.child("Users").child(userID).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("Firebase", "Successfully wrote user " + userID + " to database");
+                    // Navigate to main page
+                    _navController.navigate(R.id.action_signUpFragment_to_mainActivity);
+                } else {
+                    Log.d("Firebase", "Failed to write user " + userID + " to database");
+                    deleteCurrentUser(user);
+                }
+            }
+        });
+    }
 }
