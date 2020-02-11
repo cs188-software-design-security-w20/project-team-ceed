@@ -48,13 +48,6 @@
             android:text="Don't have an account? Sign up."
             android:textAlignment="center" />
 
-        <CheckBox
-            android:id="@+id/checkBoxCaptcha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="I'm not a robott"
-            android:textAlignment="center" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

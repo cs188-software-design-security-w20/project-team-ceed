@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,9 +43,10 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     private EditText _editTextEmailLogIn;
     private EditText _editTextPasswordLogIn;
     private TextView _textViewRegister;
-    private CheckBox _checkboxCaptcha;
 
     private String captchaSiteKey = "6Le8z9UUAAAAALkZDnjTgDn7Hcxw8xvuPSHmj97W";
+    private Integer MAX_TRIES = 3;
+    private Integer _attempts = 0;
 
     private ProgressBar _progressBarRegister;
 
@@ -82,64 +82,68 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
         _editTextEmailLogIn = (EditText) view.findViewById(R.id.editTextEmailLogIn);
         _editTextPasswordLogIn = (EditText) view.findViewById(R.id.editTextPasswordLogIn);
         _textViewRegister = (TextView) view.findViewById(R.id.textViewRegister);
-        _checkboxCaptcha = (CheckBox) view.findViewById(R.id.checkBoxCaptcha);
 
         _buttonLogIn.setOnClickListener(this);
         _textViewRegister.setOnClickListener(this);
-        _checkboxCaptcha.setOnClickListener(this);
         _progressBarRegister = new ProgressBar(_context);
 
     }
 
     @Override
     public void onClick(View view) {
-        if (view == _buttonLogIn) {
+        if (view == _buttonLogIn && _attempts < MAX_TRIES) {
             logIn();
-        } else if (view == _textViewRegister) {
+        } else if (view == _buttonLogIn && _attempts >= MAX_TRIES) {
+            captcha();
+        }
+        else if (view == _textViewRegister) {
             // open sign-in activity
             _navController.navigate(R.id.action_logInFragment_to_signUpFragment);
-        } else if (view == _checkboxCaptcha) {
-                SafetyNet.getClient(_context).verifyWithRecaptcha(captchaSiteKey)
-                        .addOnSuccessListener((Executor) this,
-                                new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
-                                    @Override
-                                    public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
-                                        // Indicates communication with reCAPTCHA service was
-                                        // successful.
-                                        String userResponseToken = response.getTokenResult();
-                                        if (!userResponseToken.isEmpty()) {
-                                            // Validate the user response token using the
-                                            // reCAPTCHA siteverify API.
-                                        }
-                                    }
-                                })
-                        .addOnFailureListener((Executor) this, new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                if (e instanceof ApiException) {
-                                    // An error occurred when communicating with the
-                                    // reCAPTCHA service. Refer to the status code to
-                                    // handle the error appropriately.
-                                    ApiException apiException = (ApiException) e;
-                                    int statusCode = apiException.getStatusCode();
-                                    Toast.makeText(
-                                            _context,
-                                            "Error: " + CommonStatusCodes
-                                                    .getStatusCodeString(statusCode),
-                                            Toast.LENGTH_SHORT
-                                    ).show();
-                                } else {
-                                    // A different, unknown type of error occurred.
-                                    Toast.makeText(
-                                            _context,
-                                            "Error: " + e.getMessage(),
-                                            Toast.LENGTH_SHORT
-                                    ).show();
-                                }
-                            }
-                        });
-                }
         }
+    }
+
+    private void captcha() {
+        SafetyNet.getClient(_context).verifyWithRecaptcha(captchaSiteKey)
+                .addOnSuccessListener((Activity) _context,
+                        new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
+                            @Override
+                            public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
+                                // Indicates communication with reCAPTCHA service was
+                                // successful.
+                                String userResponseToken = response.getTokenResult();
+                                if (!userResponseToken.isEmpty()) {
+                                    // Validate the user response token using the
+                                    // reCAPTCHA siteverify API.
+                                }
+                                logIn();
+                            }
+                        })
+                .addOnFailureListener((Activity) _context, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (e instanceof ApiException) {
+                            // An error occurred when communicating with the
+                            // reCAPTCHA service. Refer to the status code to
+                            // handle the error appropriately.
+                            ApiException apiException = (ApiException) e;
+                            int statusCode = apiException.getStatusCode();
+                            Toast.makeText(
+                                    _context,
+                                    "Error: " + CommonStatusCodes
+                                            .getStatusCodeString(statusCode),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        } else {
+                            // A different, unknown type of error occurred.
+                            Toast.makeText(
+                                    _context,
+                                    "Error: " + e.getMessage(),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                });
+    }
 
     private void logIn() {
         String email = _editTextEmailLogIn.getText().toString().trim();
@@ -167,6 +171,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                                     _navController.navigate(R.id.action_logInFragment_to_mainActivity);
                                     ((Activity) _context).finish();
                                     //startActivity(new Intent(getActivity(), MainActivity.class));
+                                    _attempts = 0;
                                 } else {
                                     if (task.getException() != null) {
                                         Toast.makeText(
@@ -182,7 +187,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                                                 Toast.LENGTH_SHORT
                                         ).show();
                                     }
-
+                                    _attempts += 1;
                                 }
                                 _progressBarRegister.setVisibility(View.GONE);
                             }
