@@ -1,0 +1,32 @@
+users
+	user_id : {	
+		email: string,
+		display_name: string,
+		profile_photo: url,
+	}
+
+user_trips
+	user_id : {
+		trip_id: state,
+	}
+
+trips	
+	trip_id : {
+		name: string,
+		source: {
+    	    name: string,
+    	    id: place_id,
+    	},
+		destination: {
+    	    name: string,
+    	    id: place_id,
+    	},
+		stops: {
+			place_id: name,
+		},
+		owner_id: user_id,
+		member_ids: {
+			user_id: state,
+		},
+	}
+
