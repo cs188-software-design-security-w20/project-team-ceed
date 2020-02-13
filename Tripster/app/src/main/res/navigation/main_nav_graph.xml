@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/profileFragment">
+    app:startDestination="@id/tripListFragment2">
 
     <fragment
         android:id="@+id/profileFragment"
@@ -12,14 +12,7 @@
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment_to_startActivity"
-            app:destination="@id/startActivity"
-            app:popUpTo="@+id/signUpFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_profileFragment_to_tripViewActivity"
-            app:destination="@id/tripView" />
-
+            app:destination="@id/startActivity" />
     </fragment>
 
     <activity
@@ -32,4 +25,15 @@
         android:name="com.ceed.tripster.TripViewActivity"
         android:label="activity_trip_view"
         tools:layout="@layout/activity_trip_view" />
+    <fragment
+        android:id="@+id/tripListFragment2"
+        android:name="com.ceed.tripster.TripListFragment"
+        android:label="TripListFragment" >
+        <action
+            android:id="@+id/action_tripListFragment2_to_tripView"
+            app:destination="@id/tripView" />
+        <action
+            android:id="@+id/action_tripListFragment2_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
 </navigation>

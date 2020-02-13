@@ -81,7 +81,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             ((Activity) _context).finish();
         } else if (view == _buttonTripView) {
             Log.d("Ay", "wjat");
-            _navController.navigate(R.id.action_profileFragment_to_tripViewActivity);
+            //_navController.navigate(R.id.action_profileFragment_to_tripViewActivity);
         }
     }
 }
