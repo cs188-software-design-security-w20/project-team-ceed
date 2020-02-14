@@ -17,6 +17,15 @@
                             <option name="y" value="186" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_profileFragment_to_startActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -37,8 +46,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-29" />
-                            <option name="y" value="-150" />
+                            <option name="x" value="-35" />
+                            <option name="y" value="-26" />
                           </Point>
                         </option>
                         <option name="myPositions">

@@ -6,15 +6,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
@@ -53,6 +58,42 @@ public class TripViewActivity extends FragmentActivity
         _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
 
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
+                // Add a marker in Sydney and move the camera
+                _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
+                _map.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i("TAG", "An error occurred: " + status);
+            }
+        });
+
+        View searchCard = findViewById(R.id.autocomplete_fragment);
+        searchCard.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Do something in response to button click
+                Log.d("tag", "Close");
+                _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+            }
+        });
+
+
     }
 
 
@@ -77,7 +118,9 @@ public class TripViewActivity extends FragmentActivity
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + _adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "You clicked " + _adapter.getItem(position) +
+                " on row number " + position, Toast.LENGTH_SHORT).show();
     }
+
 
 }

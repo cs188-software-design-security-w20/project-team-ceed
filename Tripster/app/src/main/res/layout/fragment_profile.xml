@@ -31,12 +31,12 @@
             android:id="@+id/buttonLogout"
             android:layout_gravity="center_horizontal" />
 
-        <Button
+        <!--<Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Trip View"
             android:id="@+id/buttonTripView"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal" />-->
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

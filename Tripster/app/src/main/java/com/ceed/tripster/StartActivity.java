@@ -7,6 +7,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class StartActivity extends AppCompatActivity {
@@ -16,6 +18,12 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize the SDK
+        Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
+
+        // Create a new Places client instance
+        PlacesClient placesClient = Places.createClient(this);
 
         _firebaseAuth = FirebaseAuth.getInstance();
 
