@@ -76,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MAINACTIVITY", "Option selected");
         //TripListFragment t_fragment = (TripListFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_main);
         //t_fragment.goToProfile();
-        mNavController.navigate(R.id.action_tripListFragment2_to_profileFragment);
+        Log.d("MAIN ACTIVITY", mNavController.getCurrentDestination().toString());
+        Log.d("MAIN ACTIVITY", Integer.toString(R.id.nav_host_fragment_main));
+        if (mNavController.getCurrentDestination().getId() == mNavController.getGraph().getStartDestination()) {
+            mNavController.navigate(R.id.action_tripListFragment2_to_profileFragment);
+        }
 
         return super.onOptionsItemSelected(item);
     }

@@ -64,14 +64,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Get resources for the views
         _buttonLogOut = (Button) view.findViewById(R.id.buttonLogout);
         _textViewUserEmail = (TextView) view.findViewById(R.id.textViewUserEmail);
-        _buttonTripView = (Button) view.findViewById(R.id.buttonTripView);
+
 
         // Set the display text
         _textViewUserEmail.setText("Welcome " + user.getDisplayName());
 
         // Initialize the button
         _buttonLogOut.setOnClickListener(this);
-        _buttonTripView.setOnClickListener(this);
 
     }
 
@@ -83,9 +82,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             // Switch to the login fragment
             _navController.navigate(R.id.action_profileFragment_to_startActivity);
             ((Activity) _context).finish();
-        } else if (view == _buttonTripView) {
-            Log.d("Ay", "wjat");
-            //_navController.navigate(R.id.action_profileFragment_to_tripViewActivity);
         }
     }
 }
