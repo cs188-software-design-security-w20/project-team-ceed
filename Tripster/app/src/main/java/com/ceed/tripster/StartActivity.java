@@ -19,12 +19,6 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
-
-        // Create a new Places client instance
-        PlacesClient placesClient = Places.createClient(this);
-
         _firebaseAuth = FirebaseAuth.getInstance();
 
         if (_firebaseAuth.getCurrentUser() != null) {
