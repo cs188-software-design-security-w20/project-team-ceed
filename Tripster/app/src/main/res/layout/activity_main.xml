@@ -11,6 +11,8 @@
         layout = "@layout/main_app_bar"
         android:id="@+id/main_app_bar"></include>
 
+
+
     <fragment
         android:id="@+id/nav_host_fragment_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
