@@ -3,13 +3,13 @@ package com.ceed.tripster;
 public class Stop {
 
     private String name;
-    private int type;
+    private String type;
 
     public Stop() {
 
     }
 
-    public Stop(String name, int type) {
+    public Stop(String name, String type) {
         this.name = name;
         this.type = type;
     }
@@ -22,11 +22,11 @@ public class Stop {
         this.name = name;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
