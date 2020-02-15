@@ -26,6 +26,7 @@ import android.widget.Toolbar;
 import com.google.android.material.appbar.AppBarLayout;
 
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.List;
 
 import static androidx.navigation.Navigation.findNavController;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     FirebaseAuth _firebaseAuth;
     private ArrayList<String> tripNames = new ArrayList<>();
@@ -76,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MAINACTIVITY", "Option selected");
         //TripListFragment t_fragment = (TripListFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_main);
         //t_fragment.goToProfile();
-        Log.d("MAIN ACTIVITY", mNavController.getCurrentDestination().toString());
-        Log.d("MAIN ACTIVITY", Integer.toString(R.id.nav_host_fragment_main));
+
         if (mNavController.getCurrentDestination().getId() == mNavController.getGraph().getStartDestination()) {
             mNavController.navigate(R.id.action_tripListFragment2_to_profileFragment);
         }

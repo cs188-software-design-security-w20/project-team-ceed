@@ -23,15 +23,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TripListFragment extends Fragment {
+public class TripListFragment extends Fragment{
 
     private Context mContext;
     private NavController mNavController;
-    private ArrayList<String> tripNames = new ArrayList<>();
+    private ArrayList<String> mtripNames = new ArrayList<>();
+    private TabLayout mtabLayout;
 
     public TripListFragment() {
         // Required empty public constructor
@@ -71,7 +73,28 @@ public class TripListFragment extends Fragment {
         });
 
         //View rootView = inflater.inflate(R.layout.tabbar_layout, container, false);
+        mtabLayout = (TabLayout) view.findViewById(R.id.tablayout);
+        TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if(tab == mtabLayout.getTabAt(0)){
+                    Log.d("TRIPLIST FRAGMENT", "currTripTab clicked");
+                } else if (tab == mtabLayout.getTabAt(1)) {
+                    Log.d("TRIPLIST FRAGMENT", "pastTripTab clicked");
+                }
+            }
 
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        };
+        mtabLayout.addOnTabSelectedListener(onTabSelectedListener);
         initTripNames();
 
     }
@@ -84,24 +107,24 @@ public class TripListFragment extends Fragment {
     }
 
     private void initTripNames() {
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
-        tripNames.add("Hello");
-        tripNames.add("World");
-        tripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
+        mtripNames.add("Hello");
+        mtripNames.add("World");
+        mtripNames.add("Goodbye");
         initRecyclerView();
     }
 
@@ -111,10 +134,9 @@ public class TripListFragment extends Fragment {
             Log.d("MAINACTIVITY", "recyclerview null");
         }
         Log.d("MAINACTIVITY", "TRIPLISTADAPTER CONSTRUCTOR BEING CALLED #############");
-        TripListAdapter adapter = new TripListAdapter(mContext, tripNames, mNavController);
+        TripListAdapter adapter = new TripListAdapter(mContext, mtripNames, mNavController);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
     }
-
 
 }
