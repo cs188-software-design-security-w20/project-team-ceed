@@ -22,6 +22,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +61,14 @@ public class TripListFragment extends Fragment {
                               Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
         mNavController = Navigation.findNavController(view);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mNavController.navigate(R.id.action_tripListFragment2_to_newTripFragment);
+            }
+        });
 
         //View rootView = inflater.inflate(R.layout.tabbar_layout, container, false);
 

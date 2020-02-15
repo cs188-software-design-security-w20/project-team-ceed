@@ -35,5 +35,13 @@
         <action
             android:id="@+id/action_tripListFragment2_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_tripListFragment2_to_newTripFragment"
+            app:destination="@id/newTripFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/newTripFragment"
+        android:name="com.ceed.tripster.NewTripFragment"
+        android:label="fragment_new_trip"
+        tools:layout="@layout/fragment_new_trip" />
 </navigation>
