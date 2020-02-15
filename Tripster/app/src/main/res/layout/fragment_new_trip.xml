@@ -10,6 +10,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="text"
+        android:id="@+id/editTextTripName"
         android:hint="Enter name" />
 
     <androidx.cardview.widget.CardView
@@ -52,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create trip"
-        android:id="@+id/createTrip"
+        android:id="@+id/buttonCreateTrip"
         android:layout_gravity="center_horizontal "
         />
 

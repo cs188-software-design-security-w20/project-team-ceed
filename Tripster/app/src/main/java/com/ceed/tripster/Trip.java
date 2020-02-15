@@ -8,6 +8,11 @@ public class Trip {
 
     }
 
+    public Trip(String name, HashMap<String, Stop> stops, HashMap<String, Integer> memberIds) {
+        this.name = name;
+        this.stops = stops;
+        this.memberIds = memberIds;
+    }
 
     private String name;
 
