@@ -1,5 +1,6 @@
 package com.ceed.tripster;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,15 +18,28 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TripViewActivity extends FragmentActivity
         implements OnMapReadyCallback, ItineraryAdapter.ItemClickListener {
@@ -33,6 +47,10 @@ public class TripViewActivity extends FragmentActivity
     private GoogleMap _map;
     private BottomSheetBehavior _bottomSheetBehavior;
     private ItineraryAdapter _adapter;
+    private DatabaseReference _tripDatabaseReference;
+    private String _tripId;
+    private Trip _trip;
+    private AutocompleteSessionToken _autocompleteSessionToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +61,7 @@ public class TripViewActivity extends FragmentActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+        _autocompleteSessionToken = AutocompleteSessionToken.newInstance();
         RecyclerView recyclerView = findViewById(R.id.itineraryRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -58,6 +76,24 @@ public class TripViewActivity extends FragmentActivity
 
 
         _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
+
+        // Initialize the tripId
+        _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
+
+        // Initialize the database reference
+        _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripId);
+
+        // Initializing the trip
+        HashMap<String, Stop> tripStops = new HashMap<>();
+        HashMap<String, String> tripMembers = new HashMap<>();
+        _trip = new Trip("test name", "test start", "test destination", tripStops, tripMembers);
+
+        // Get the trip
+        getTripFromId();
+
+        // Get the trip stops
+        // Log.d("doobie", _trip.toString());
+        // getStops();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
@@ -98,13 +134,55 @@ public class TripViewActivity extends FragmentActivity
 
             }
         });
-
-        Log.d("TRIPVIEW ACTIVITY", "onCreate: " + TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID());
     }
 
+    public void getTripFromId() {
+        _tripDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Trip newTrip = dataSnapshot.getValue(Trip.class);
 
+                _trip.copy(newTrip);
+                Log.d("before", _trip.getName());
+                Log.d("before", _trip.getStart());
+                Log.d("before", _trip.getDestination());
+                Log.d("before", _trip.getStops().toString());
+                setTrip(newTrip);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    public void getStops() {
+        // Get Stops
+        HashMap<String, Stop> tripStops = _trip.getStops();
+
+        // Get places client
+        PlacesClient placesClient = Places.createClient(getApplicationContext());
+
+        // Iterate through each stop
+        for (Map.Entry mapElement : tripStops.entrySet()) {
+            String tripId = (String) mapElement.getKey();
+            Stop stop = (Stop) mapElement.getValue();
+
+            List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS);
+            FetchPlaceRequest request = FetchPlaceRequest.newInstance(tripId, placeFields);
+
+            placesClient.fetchPlace(request).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
+                @Override
+                public void onSuccess(FetchPlaceResponse fetchPlaceResponse) {
+                    Place place = fetchPlaceResponse.getPlace();
+                    Log.d("Google Places", "Place found: " + place.getName());
+                    Log.d("Google Places", "Address found: " + place.getAddress());
+                    Log.d("Google Places", "LatLng found: " + place.getLatLng());
+                }
+            });
+        }
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -130,5 +208,10 @@ public class TripViewActivity extends FragmentActivity
                 " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
-
+    private void setTrip(Trip trip) {
+        Log.d("after", _trip.getName());
+        Log.d("after", _trip.getStart());
+        Log.d("after", _trip.getDestination());
+        Log.d("after", _trip.getStops().toString());
+    }
 }

@@ -1,8 +1,19 @@
 package com.ceed.tripster;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
+import java.util.Map;
 
 public class Trip {
+
+    private String name;
+
+    private String start;
+    private String destination;
+
+    private HashMap<String, Stop> stops;
+    private HashMap<String, String> memberIds;
 
     public Trip() {
 
@@ -16,13 +27,39 @@ public class Trip {
         this.memberIds = memberIds;
     }
 
-    private String name;
+    public Trip(Trip c) {
+        this.name = c.name;
+        this.start = c.start;
+        this.destination = c.destination;
 
-    private String start;
-    private String destination;
+        for (Map.Entry mapElement : c.getStops().entrySet()) {
+            Stop newStop = new Stop((Stop) mapElement.getValue());
+            String newKey = new String((String) mapElement.getKey());
+            this.stops.put(newKey, newStop);
+        }
+        for (Map.Entry mapElement : c.getMemberIds().entrySet()) {
+            String newMemberId = new String((String) mapElement.getValue());
+            String newMemberState = new String((String) mapElement.getKey());
+            this.memberIds.put(newMemberId, newMemberState);
+        }
+    }
 
-    private HashMap<String, Stop> stops;
-    private HashMap<String, String> memberIds;
+    public void copy(Trip c) {
+        this.name = c.name;
+        this.start = c.start;
+        this.destination = c.destination;
+
+        for (Map.Entry mapElement : c.getStops().entrySet()) {
+            Stop newStop = new Stop((Stop) mapElement.getValue());
+            String newKey = new String((String) mapElement.getKey());
+            this.stops.put(newKey, newStop);
+        }
+        for (Map.Entry mapElement : c.getMemberIds().entrySet()) {
+            String newMemberId = new String((String) mapElement.getValue());
+            String newMemberState = new String((String) mapElement.getKey());
+            this.memberIds.put(newMemberId, newMemberState);
+        }
+    }
 
     public String getName() {
         return name;

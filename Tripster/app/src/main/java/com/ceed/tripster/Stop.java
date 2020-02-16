@@ -14,6 +14,11 @@ public class Stop {
         this.type = type;
     }
 
+    public Stop(Stop c) {
+        this.name = c.name;
+        this.type = c.type;
+    }
+
     public String getName() {
         return name;
     }
