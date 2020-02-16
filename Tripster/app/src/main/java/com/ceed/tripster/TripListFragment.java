@@ -168,12 +168,12 @@ public class TripListFragment extends Fragment{
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab == _tabLayout.getTabAt(0)){
-                    Log.d("TRIPLIST FRAGMENT", "currTripTab clicked");
+                    Log.d("TripList Fragment", "currTripTab clicked");
                     tabState = "active";
                     _adapter.notifyDataSetChanged();
 
                 } else if (tab == _tabLayout.getTabAt(1)) {
-                    Log.d("TRIPLIST FRAGMENT", "pastTripTab clicked");
+                    Log.d("TripList Fragment", "pastTripTab clicked");
                     _adapter.notifyDataSetChanged();
                     tabState = "inactive";
                 }
