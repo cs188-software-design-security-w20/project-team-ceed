@@ -141,13 +141,13 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
 
     private void writeTripToDatabase() {
         final String tripName = _editTextTripName.getText().toString().trim();
-        String uid = _firebaseAuth.getCurrentUser().getUid();
+        final String userId = _firebaseAuth.getCurrentUser().getUid();
         DatabaseReference newTrip = _databaseRoot.child("Trips").push();
-        String newTripId = newTrip.getKey();
+        final String newTripId = newTrip.getKey();
 
         // Initializing stops
-        Stop startStop = new Stop(_startPlace.getName(), 0);
-        Stop endStop = new Stop(_endPlace.getName(), 0);
+        Stop startStop = new Stop(_startPlace.getName(), "start");
+        Stop endStop = new Stop(_endPlace.getName(), "end");
 
         HashMap<String, Stop> stops = new HashMap<>();
 
@@ -159,11 +159,13 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         trip.setStops(stops);
 
         // Initially, the only member is the creator
-        HashMap<String, Integer> members = new HashMap<>();
-        members.put(uid, 1);
+        HashMap<String, String> members = new HashMap<>();
+        members.put(userId, "owner");
 
         trip.setMemberIds(members);
         trip.setName(tripName);
+        trip.setStart(_startPlace.getName());
+        trip.setDestination(_endPlace.getName());
 
         _databaseRoot.child("Trips").child(newTripId).setValue(trip).addOnCompleteListener(
                 new OnCompleteListener<Void>() {
@@ -175,12 +177,38 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
                                 "Successfully created trip",
                                 Toast.LENGTH_SHORT
                             ).show();
+                            addTripToUser(userId, newTripId);
                         }
                         else {
                             Toast.makeText(
                                 _context,
                                 "Failed to create trip",
                                 Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                });
+    }
+
+    private void addTripToUser(final String userId, final String newTripId) {
+        HashMap<String, String> userTripMap = new HashMap<>();
+        userTripMap.put("state", "active");
+        _databaseRoot.child("User Trips").child(userId).child(newTripId).setValue(userTripMap).addOnCompleteListener(
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(
+                                    _context,
+                                    "Added trip " + newTripId + " to user " + userId,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                        else {
+                            Toast.makeText(
+                                    _context,
+                                    "Failed to add trip " + newTripId + " to user " + userId,
+                                    Toast.LENGTH_SHORT
                             ).show();
                         }
                     }
