@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -74,6 +75,7 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         _buttonAddTrip.setOnClickListener(this);
 
         if (!Places.isInitialized()) {
+            // TODO Secure API key
             Places.initialize(_context.getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
         }
 
@@ -108,7 +110,8 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
                 getChildFragmentManager().findFragmentById(R.id.enter_end_autocomplete_fragment);
 
         // Specify the types of place data to return.
-        endAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        endAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.LAT_LNG, Place.Field.ADDRESS));
 
 
         Place end_place;
@@ -146,8 +149,11 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         final String newTripId = newTrip.getKey();
 
         // Initializing stops
-        Stop startStop = new Stop(_startPlace.getName(), "start");
-        Stop endStop = new Stop(_endPlace.getName(), "end");
+        Stop startStop = new Stop(_startPlace.getName(), "start", _startPlace.getAddress(),
+                _startPlace.getLatLng().latitude, _startPlace.getLatLng().longitude);
+
+        Stop endStop = new Stop(_endPlace.getName(), "end", _endPlace.getAddress(),
+                _endPlace.getLatLng().latitude, _endPlace.getLatLng().longitude);
 
         HashMap<String, Stop> stops = new HashMap<>();
 
