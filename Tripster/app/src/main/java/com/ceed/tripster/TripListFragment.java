@@ -36,11 +36,10 @@ public class TripListFragment extends Fragment{
     private TabLayout _tabLayout;
     private View _tripListView;
     private RecyclerView _myTripList;
-    private FirebaseRecyclerAdapter<UserTrip, TripsViewHolder> _adapter;
+    private TripListAdapter _adapter;
 
     private DatabaseReference _tripsDatabaseReference;
     private DatabaseReference _myTripsDatabaseReference;
-    private String tabState;
 
     public TripListFragment() {
         // Required empty public constructor
@@ -62,7 +61,6 @@ public class TripListFragment extends Fragment{
         _myTripList.setLayoutManager(new LinearLayoutManager(_context));
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        tabState = "active";
 
         _tripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips");
         _myTripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips").child(userId);
@@ -79,6 +77,7 @@ public class TripListFragment extends Fragment{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 _navController.navigate(R.id.action_tripListFragment2_to_newTripFragment);
             }
         });
@@ -89,75 +88,7 @@ public class TripListFragment extends Fragment{
                 .setQuery(_myTripsDatabaseReference, UserTrip.class)
                 .build();
 
-        _adapter =
-                new FirebaseRecyclerAdapter<UserTrip, TripsViewHolder>(options) {
-                    @Override
-                    protected void onBindViewHolder(@NonNull final TripsViewHolder holder, int position, @NonNull UserTrip model) {
-                        final String listTripId = getRef(position).getKey();
-                        Log.d("Firebase", "ID: "+ listTripId);
-                        // TODO: This is where the logic goes to check the state of each trip
-                        DatabaseReference getStateRef = getRef(position).child("state").getRef();
-                        getStateRef.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    holder._layoutTripListItem.setVisibility(View.VISIBLE);
-                                    holder._layoutTripListItem.getChildAt(0).setVisibility(View.VISIBLE);
-                                    String type = dataSnapshot.getValue().toString();
-                                    Log.d("Firebase", "snapshot type: " + type);
-                                    Log.d("Firebase", "tab state: " + tabState);
-                                    if (TextUtils.equals(type, tabState)) {
-                                        Log.d("Firebase", "tab state == snapshot type");
-                                        _tripsDatabaseReference.child(listTripId).addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                final String tripName = dataSnapshot.child("name").getValue().toString();
-                                                final String start = dataSnapshot.child("start").getValue().toString();
-                                                final String destination = dataSnapshot.child("destination").getValue().toString();
-
-                                                holder._textViewTripName.setText(tripName);
-                                                holder._textViewStartLocation.setText(start);
-                                                holder._textViewEndLocation.setText(destination);
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                Log.d("Firebase", "Error: " + databaseError.getMessage());
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        Log.d("Debug", "Making the holder gone");
-                                        holder._layoutTripListItem.setVisibility(View.GONE);
-                                        holder._layoutTripListItem.getChildAt(0).setVisibility(View.GONE);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        holder._layoutTripListItem.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                _navController.navigate(R.id.action_tripListFragment2_to_tripView);
-                            }
-                        });
-
-                    }
-
-                    @NonNull
-                    @Override
-                    public TripsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip_list_item, parent, false);
-                        TripsViewHolder holder = new TripsViewHolder(view);
-
-                        return holder;
-                    }
-                };
+        _adapter = new TripListAdapter(options, "active", _tripsDatabaseReference, _navController);
 
         _myTripList.setAdapter(_adapter);
         _adapter.startListening();
@@ -169,13 +100,13 @@ public class TripListFragment extends Fragment{
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab == _tabLayout.getTabAt(0)){
                     Log.d("TRIPLIST FRAGMENT", "currTripTab clicked");
-                    tabState = "active";
+                    _adapter.set_tabState("active");
                     _adapter.notifyDataSetChanged();
 
                 } else if (tab == _tabLayout.getTabAt(1)) {
                     Log.d("TRIPLIST FRAGMENT", "pastTripTab clicked");
                     _adapter.notifyDataSetChanged();
-                    tabState = "inactive";
+                    _adapter.set_tabState("inactive");
                 }
             }
 
@@ -198,6 +129,7 @@ public class TripListFragment extends Fragment{
         TextView _textViewStartLocation;
         TextView _textViewEndLocation;
         RelativeLayout _layoutTripListItem;
+        String _tripID;
 
         public TripsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -205,6 +137,9 @@ public class TripListFragment extends Fragment{
             _textViewStartLocation= itemView.findViewById(R.id.textViewStartLocation);
             _textViewEndLocation = itemView.findViewById(R.id.textViewEndLocation);
             _layoutTripListItem= itemView.findViewById(R.id.layoutTripListItem);
+
         }
+
+
     }
 }
