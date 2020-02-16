@@ -99,8 +99,10 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
-
+        Log.d("TRIPVIEW ACTIVITY", "onCreate: " + TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID());
     }
+
+
 
 
     /**
