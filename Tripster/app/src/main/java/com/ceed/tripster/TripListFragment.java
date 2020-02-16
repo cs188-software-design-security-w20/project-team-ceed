@@ -39,6 +39,7 @@ public class TripListFragment extends Fragment{
 
     private DatabaseReference _tripsDatabaseReference;
     private DatabaseReference _myTripsDatabaseReference;
+    private String tabState;
 
     public TripListFragment() {
         // Required empty public constructor
@@ -60,6 +61,7 @@ public class TripListFragment extends Fragment{
         _myTripList.setLayoutManager(new LinearLayoutManager(_context));
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        tabState = "active";
 
         _tripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips");
         _myTripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips").child(userId);
@@ -87,8 +89,11 @@ public class TripListFragment extends Fragment{
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab == _tabLayout.getTabAt(0)){
                     Log.d("TRIPLIST FRAGMENT", "currTripTab clicked");
+                    tabState = "active";
+
                 } else if (tab == _tabLayout.getTabAt(1)) {
                     Log.d("TRIPLIST FRAGMENT", "pastTripTab clicked");
+                    tabState = "inactive";
                 }
             }
 
@@ -123,7 +128,10 @@ public class TripListFragment extends Fragment{
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.exists()) {
                                     String type = dataSnapshot.getValue().toString();
-                                    if (TextUtils.equals(type, "active")) {
+                                    Log.d("doobie", "snapshot type: " + type);
+                                    Log.d("doobie", "tab state: " + tabState);
+                                    if (TextUtils.equals(type, tabState)) {
+                                        Log.d("doobie", "tab state == snapshot type");
                                         _tripsDatabaseReference.child(listTripId).addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
