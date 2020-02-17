@@ -1,7 +1,6 @@
 package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -14,9 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
@@ -29,12 +26,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.FetchPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -53,8 +46,6 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,6 +64,8 @@ public class TripViewActivity extends FragmentActivity
 
     private Stop _startStop;
     private Stop _endStop;
+    private String _endStopPlaceId;
+    private ArrayList<com.google.maps.model.LatLng> _wayPoints;
     private GeoApiContext _geoApiContext;
 
     private TextView _textViewTripName;
@@ -84,6 +77,8 @@ public class TripViewActivity extends FragmentActivity
 
     private DatabaseReference _databaseRoot;
     String _userId;
+
+    private Trip _trip;
 
 
     @Override
@@ -152,13 +147,15 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
 
-
-                createRoute(setStops(dataItem.getStops()));
+                _wayPoints = setStops(dataItem.getStops());
+                createRoute();
 
 
                 _textViewTripName.setText(dataItem.getName());
                 _textViewStartLocation.setText(dataItem.getStart());
                 _textViewEndLocation.setText(dataItem.getDestination());
+
+                _trip = dataItem;
             }
         });
 
@@ -170,9 +167,11 @@ public class TripViewActivity extends FragmentActivity
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setHint("Add stop");
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.LAT_LNG, Place.Field.ADDRESS));
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -181,8 +180,25 @@ public class TripViewActivity extends FragmentActivity
                 // TODO: Get info about the selected place.
                 Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
                 // Add a marker in Sydney and move the camera
-                _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
+
+
+
+                _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                 _map.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+
+
+                // Waypoints.size() + 2 to get to end of list
+                Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
+                        place.getLatLng().latitude, place.getLatLng().longitude, _wayPoints.size() + 2);
+
+                _endStop.setIndex(_endStop.getIndex() + 1);
+                _trip.getStops().put(_endStopPlaceId, _endStop);
+                writeStopToDatabase(place.getId(), stop);
+
+                _wayPoints.add(new com.google.maps.model.LatLng(place.getLatLng().latitude,
+                        place.getLatLng().longitude));
+                createRoute();
             }
 
             @Override
@@ -202,9 +218,11 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
-        if (_geoApiContext == null) {
-            _geoApiContext = new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
-        }
+       if (_geoApiContext == null) {
+           _geoApiContext =
+                   new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
+       }
+
         _databaseRoot = FirebaseDatabase.getInstance().getReference();
 
 
@@ -226,9 +244,10 @@ public class TripViewActivity extends FragmentActivity
         readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
             @Override
             public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
-                if(dataItem != null){
+                if (dataItem != null && dataItem.get(_tripId) != null) {
                     String tripState = dataItem.get(_tripId).get("state");
-                    if (TextUtils.equals(tripState, "pending")) {
+                    if(TextUtils.equals(tripState, "pending")) {
+
                         acceptfab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -262,7 +281,9 @@ public class TripViewActivity extends FragmentActivity
                     } else {
                         acceptfab.setVisibility(View.GONE);
                         rejectfab.setVisibility(View.GONE);
-                    }}
+                    }
+                }
+
 
             }
         });
@@ -347,6 +368,7 @@ public class TripViewActivity extends FragmentActivity
                 _map.moveCamera(CameraUpdateFactory.newLatLng(start));
             } else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
+                _endStopPlaceId = (String) mapElement.getKey();
                 // Add a marker in Sydney and move the camera
                 LatLng end = new LatLng(_endStop.getLatitude(), _endStop.getLongitude());
                 _map.addMarker(new MarkerOptions().position(end).title(_endStop.getName())
@@ -368,7 +390,7 @@ public class TripViewActivity extends FragmentActivity
         return wayPoints;
     }
 
-    private void createRoute(ArrayList<com.google.maps.model.LatLng> wayPoints) {
+    private void createRoute() {
 
         com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
                 _endStop.getLatitude(),
@@ -386,8 +408,8 @@ public class TripViewActivity extends FragmentActivity
         );
 
 
-        if (wayPoints.size() != 0) {
-            directions.waypoints(wayPoints.toArray(new com.google.maps.model.LatLng[0]));
+        if (_wayPoints.size() != 0) {
+            directions.waypoints(_wayPoints.toArray(new com.google.maps.model.LatLng[0]));
         }
 
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
@@ -457,6 +479,15 @@ public class TripViewActivity extends FragmentActivity
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
         }
+    }
+
+    private void writeStopToDatabase(String placeId, Stop stop) {
+        HashMap<String, Stop> stops= _trip.getStops();
+        stops.put(placeId, stop);
+
+        _trip.setStops(stops);
+
+        _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
     }
 }
 
