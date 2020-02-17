@@ -100,13 +100,6 @@ public class TripViewActivity extends FragmentActivity
                 layoutManager.getOrientation());
         _itineraryStops.addItemDecoration(dividerItemDecoration);
 
-        /*
-        String[] dummy = {"Hello", "World", "Goodbye"};
-        _adapter = new ItineraryAdapter(this, Arrays.asList(dummy));
-        _adapter.setClickListener(this);
-        recyclerView.setAdapter(_adapter);
-        */
-
 
         // Initialize the tripId
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
@@ -125,7 +118,6 @@ public class TripViewActivity extends FragmentActivity
 
         _itineraryStops.setAdapter(_adapter);
         _adapter.startListening();
-        //
 
         _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
@@ -140,7 +132,10 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getDestination());
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
-                setStops(dataItem.getStops());
+
+
+                createRoute(setStops(dataItem.getStops()));
+
 
                 _textViewTripName.setText(dataItem.getName());
                 _textViewStartLocation.setText(dataItem.getStart());
@@ -239,7 +234,7 @@ public class TripViewActivity extends FragmentActivity
     }
 
 
-    private void setStops(HashMap<String, Stop> stops) {
+    private ArrayList<com.google.maps.model.LatLng> setStops(HashMap<String, Stop> stops) {
 
         ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
 
@@ -276,8 +271,7 @@ public class TripViewActivity extends FragmentActivity
 
         }
 
-
-        createRoute(wayPoints);
+        return wayPoints;
     }
 
     private void createRoute(ArrayList<com.google.maps.model.LatLng> wayPoints) {
