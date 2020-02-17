@@ -139,6 +139,16 @@ public class TripViewActivity extends FragmentActivity
             }
         });
         _databaseRoot = FirebaseDatabase.getInstance().getReference();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager manager = getSupportFragmentManager();
+                addPersonFragment p_fragment = new addPersonFragment();
+                p_fragment.show(manager, "addPersonFragment");
+            }
+        });
     }
 
 

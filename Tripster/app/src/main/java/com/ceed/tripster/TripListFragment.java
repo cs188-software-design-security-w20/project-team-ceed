@@ -100,12 +100,14 @@ public class TripListFragment extends Fragment{
 
                 } else if (tab == _tabLayout.getTabAt(1)) {
                     Log.d("TripList Fragment", "pastTripTab clicked");
-                    _adapter.notifyDataSetChanged();
                     _adapter.set_tabState("inactive");
+                    _adapter.notifyDataSetChanged();
+
                 } else if (tab == _tabLayout.getTabAt(2)) {
                     Log.d("TripList Fragment", "pendingTripTab clicked");
-                    _adapter.notifyDataSetChanged();
                     _adapter.set_tabState("pending");
+                    _adapter.notifyDataSetChanged();
+
                 }
             }
 
