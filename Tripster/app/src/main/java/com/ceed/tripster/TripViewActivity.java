@@ -28,7 +28,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
@@ -70,6 +72,7 @@ public class TripViewActivity extends FragmentActivity
 
     private Stop _startStop;
     private Stop _endStop;
+    private ArrayList<com.google.maps.model.LatLng> _wayPoints;
     private GeoApiContext _geoApiContext;
 
     private TextView _textViewTripName;
@@ -78,6 +81,8 @@ public class TripViewActivity extends FragmentActivity
     private RecyclerView _itineraryStops;
 
     private DatabaseReference _databaseRoot;
+
+    private Trip _trip;
 
 
     @Override
@@ -133,13 +138,15 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
 
-
-                createRoute(setStops(dataItem.getStops()));
+                _wayPoints = setStops(dataItem.getStops());
+                createRoute();
 
 
                 _textViewTripName.setText(dataItem.getName());
                 _textViewStartLocation.setText(dataItem.getStart());
                 _textViewEndLocation.setText(dataItem.getDestination());
+
+                _trip = dataItem;
             }
         });
 
@@ -151,9 +158,11 @@ public class TripViewActivity extends FragmentActivity
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setHint("Add stop");
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.LAT_LNG, Place.Field.ADDRESS));
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -162,8 +171,17 @@ public class TripViewActivity extends FragmentActivity
                 // TODO: Get info about the selected place.
                 Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
                 // Add a marker in Sydney and move the camera
-                _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
+
+
+
+                _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                 _map.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+
+                Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
+                        place.getLatLng().latitude, place.getLatLng().longitude);
+                writeStopToDatabase(place.getId(), stop);
+                createRoute();
             }
 
             @Override
@@ -274,7 +292,7 @@ public class TripViewActivity extends FragmentActivity
         return wayPoints;
     }
 
-    private void createRoute(ArrayList<com.google.maps.model.LatLng> wayPoints) {
+    private void createRoute() {
 
         com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
                 _endStop.getLatitude(),
@@ -292,8 +310,8 @@ public class TripViewActivity extends FragmentActivity
         );
 
 
-        if (wayPoints.size() != 0) {
-            directions.waypoints(wayPoints.toArray(new com.google.maps.model.LatLng[0]));
+        if (_wayPoints.size() != 0) {
+            directions.waypoints(_wayPoints.toArray(new com.google.maps.model.LatLng[0]));
         }
 
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
@@ -361,5 +379,14 @@ public class TripViewActivity extends FragmentActivity
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
         }
+    }
+
+    private void writeStopToDatabase(String placeId, Stop stop) {
+        HashMap<String, Stop> stops= _trip.getStops();
+        stops.put(placeId, stop);
+
+        _trip.setStops(stops);
+
+        _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
     }
 }
