@@ -37,6 +37,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.GeoApiContext;
 
 import java.util.List;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class TripViewActivity extends FragmentActivity
     private TextView _textViewStartLocation;
     private TextView _textViewEndLocation;
     private RecyclerView _itineraryStops;
-
+    private GeoApiContext _geoApiContext;
 
     private DatabaseReference _databaseRoot;
 
@@ -87,6 +88,13 @@ public class TripViewActivity extends FragmentActivity
         _adapter.setClickListener(this);
         recyclerView.setAdapter(_adapter);
         */
+
+        // new shit
+        if (_geoApiContext == null) {
+            _geoApiContext =
+                    new GeoApiContext.Builder().apiKey(getString(R.string.google_api_key)).build();
+        }
+
         // Initialize the tripId
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
