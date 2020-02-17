@@ -41,6 +41,9 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                     final String type = dataSnapshot.child(listStopId).child("type").getValue().toString();
                     final String stopName = dataSnapshot.child(listStopId).child("name").getValue().toString();
                     final String stopAddress = dataSnapshot.child(listStopId).child("address").getValue().toString();
+                    Log.d("Firebase", "Stop type: " + type);
+                    Log.d("Firebase", "Stop name: " + stopName);
+                    Log.d("Firebase", "Stop address: " + stopAddress);
                     holder._textViewStopName.setText(stopName);
                     holder._textViewStopAddress.setText(stopAddress);
                     if (TextUtils.equals(type, "start")) {
@@ -65,7 +68,7 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
     @NonNull
     @Override
     public TripViewActivity.StopsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.trip_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itinerary_item, parent, false);
         TripViewActivity.StopsViewHolder holder = new TripViewActivity.StopsViewHolder(view);
 
         return holder;
