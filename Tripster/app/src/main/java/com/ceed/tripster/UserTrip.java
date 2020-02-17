@@ -2,24 +2,14 @@ package com.ceed.tripster;
 
 public class UserTrip {
 
-    private String userId;
     private String state;
 
     public UserTrip() {
 
     }
 
-    public UserTrip(String userId, String state) {
-        this.userId = userId;
+    public UserTrip(String state) {
         this.state = state;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getState() {

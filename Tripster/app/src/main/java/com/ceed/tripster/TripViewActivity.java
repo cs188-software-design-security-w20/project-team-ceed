@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -40,6 +41,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -67,6 +69,7 @@ public class TripViewActivity extends FragmentActivity
     private BottomSheetBehavior _bottomSheetBehavior;
     private ItineraryAdapter _adapter;
     private DatabaseReference _tripDatabaseReference;
+    private DatabaseReference _userTripDatabaseReference;
     private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
 
@@ -79,8 +82,11 @@ public class TripViewActivity extends FragmentActivity
     private TextView _textViewStartLocation;
     private TextView _textViewEndLocation;
     private RecyclerView _itineraryStops;
+    private FirebaseAuth _firebaseAuth;
+
 
     private DatabaseReference _databaseRoot;
+    String _userId;
 
     private Trip _trip;
 
@@ -88,6 +94,22 @@ public class TripViewActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize the tripId
+        _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
+
+        _firebaseAuth = FirebaseAuth.getInstance();
+        _databaseRoot = FirebaseDatabase.getInstance().getReference();
+
+        _userId = _firebaseAuth.getCurrentUser().getUid();
+
+        // Initialize the database references
+        // _userTripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips").child(_userId).child(_tripId).child("state");
+        _userTripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips").child(_userId);
+        _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripId);
+        _tripStopsDatabaseReference = _tripDatabaseReference.child("stops");
+
+
         setContentView(R.layout.activity_trip_view);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -109,14 +131,12 @@ public class TripViewActivity extends FragmentActivity
         // Initialize the tripId
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
-        // Initialize the database references
-        _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripId);
-        _tripStopsDatabaseReference = _tripDatabaseReference.child("stops");
+
 
         // New Adapter
         FirebaseRecyclerOptions<Stop> options =
                 new FirebaseRecyclerOptions.Builder<Stop>()
-                        .setQuery(_tripStopsDatabaseReference, Stop.class)
+                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
                         .build();
 
         _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference);
@@ -191,6 +211,12 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
+        View searchCard = findViewById(R.id.search_card_view);
+        searchCard.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Do something in response to button click
+                Log.d("tag", "Close");
+                _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
        if (_geoApiContext == null) {
            _geoApiContext =
                    new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
@@ -199,8 +225,9 @@ public class TripViewActivity extends FragmentActivity
 
         _databaseRoot = FirebaseDatabase.getInstance().getReference();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+        FloatingActionButton addfab = findViewById(R.id.addfab);
+        addfab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getSupportFragmentManager();
@@ -208,6 +235,55 @@ public class TripViewActivity extends FragmentActivity
                 p_fragment.show(manager, "addPersonFragment");
             }
         });
+        final FloatingActionButton acceptfab = findViewById(R.id.acceptfab);
+        final FloatingActionButton rejectfab = findViewById(R.id.rejectfab);
+
+
+        readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
+            @Override
+            public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
+                String tripState = dataItem.get(_tripId).get("state");
+                if(TextUtils.equals(tripState, "pending")) {
+                    acceptfab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
+                            _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
+                        }
+                    });
+                    rejectfab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            readTripFromFirebase(new FirebaseCallback<Trip>() {
+                                @Override
+                                public void onCallback(Trip dataItem) {
+                                    // Removing user from trip
+                                    HashMap<String, String> memberIds = dataItem.getMemberIds();
+                                    memberIds.remove(_firebaseAuth.getCurrentUser().getUid());
+                                    _tripDatabaseReference.setValue(dataItem);
+                                }
+                            });
+                            readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
+                                @Override
+                                public void onCallback(HashMap<String, HashMap<String, String>> dataItem) {
+                                    // Removing the trip from user
+                                    dataItem.remove(_tripId);
+                                    _userTripDatabaseReference.setValue(dataItem);
+                                }
+                            });
+                            finish();
+                        }
+                    });
+                } else{
+                    acceptfab.setVisibility(View.GONE);
+                    rejectfab.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+
+
     }
 
 
@@ -249,6 +325,25 @@ public class TripViewActivity extends FragmentActivity
         };
 
         _tripDatabaseReference.addValueEventListener(tripEventListener);
+    }
+
+    private void readUserTripsFromFirebase(final FirebaseCallback<HashMap<String, HashMap<String, String>>> readUserTripsCallback) {
+        ValueEventListener tripEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    HashMap<String, HashMap<String, String>> tripState = (HashMap<String, HashMap<String, String>>) dataSnapshot.getValue();
+                    readUserTripsCallback.onCallback(tripState);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("Firebase", databaseError.getMessage());
+            }
+        };
+
+        _userTripDatabaseReference.addValueEventListener(tripEventListener);
     }
 
 
@@ -356,7 +451,7 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String user = dataSnapshot.getValue().toString();
-                _databaseRoot.child("Trips").child(_tripId).child("memberIds").child(user).setValue("pending");
+                _databaseRoot.child("Trips").child(_tripId).child("memberIds");
                 _databaseRoot.child("User Trips").child(user).child(_tripId).child("state").setValue("pending");
             }
 
