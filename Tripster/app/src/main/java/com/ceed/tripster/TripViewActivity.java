@@ -75,6 +75,7 @@ public class TripViewActivity extends FragmentActivity
 
     private Stop _startStop;
     private Stop _endStop;
+    private String _endStopPlaceId;
     private ArrayList<com.google.maps.model.LatLng> _wayPoints;
     private GeoApiContext _geoApiContext;
 
@@ -198,9 +199,17 @@ public class TripViewActivity extends FragmentActivity
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                 _map.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
 
+
+                // Waypoints.size() + 2 to get to end of list
                 Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
-                        place.getLatLng().latitude, place.getLatLng().longitude);
+                        place.getLatLng().latitude, place.getLatLng().longitude, _wayPoints.size() + 2);
+
+                _endStop.setIndex(_endStop.getIndex() + 1);
+                _trip.getStops().put(_endStopPlaceId, _endStop);
                 writeStopToDatabase(place.getId(), stop);
+
+                _wayPoints.add(new com.google.maps.model.LatLng(place.getLatLng().latitude,
+                        place.getLatLng().longitude));
                 createRoute();
             }
 
@@ -217,6 +226,9 @@ public class TripViewActivity extends FragmentActivity
                 // Do something in response to button click
                 Log.d("tag", "Close");
                 _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+
        if (_geoApiContext == null) {
            _geoApiContext =
                    new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
@@ -366,6 +378,7 @@ public class TripViewActivity extends FragmentActivity
             }
             else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
+                _endStopPlaceId = (String) mapElement.getKey();
                 // Add a marker in Sydney and move the camera
                 LatLng end = new LatLng(_endStop.getLatitude(), _endStop.getLongitude());
                 _map.addMarker(new MarkerOptions().position(end).title(_endStop.getName())
