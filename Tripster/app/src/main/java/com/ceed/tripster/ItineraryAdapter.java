@@ -53,6 +53,9 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                     else if (TextUtils.equals(type, "end")) {
                         holder._textViewStopType.setText("End Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
+                    } else {
+                        holder._textViewStopType.setText("");
+                        holder._textViewStopType.setVisibility(View.GONE);
                     }
                 }
             }
