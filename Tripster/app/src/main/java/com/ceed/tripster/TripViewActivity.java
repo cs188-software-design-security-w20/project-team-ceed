@@ -199,6 +199,8 @@ public class TripViewActivity extends FragmentActivity
                 // Do something in response to button click
                 Log.d("tag", "Close");
                 _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }});
+
        if (_geoApiContext == null) {
            _geoApiContext =
                    new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
@@ -224,41 +226,43 @@ public class TripViewActivity extends FragmentActivity
         readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
             @Override
             public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
-                String tripState = dataItem.get(_tripId).get("state");
-                if(TextUtils.equals(tripState, "pending")) {
-                    acceptfab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
-                            _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
-                        }
-                    });
-                    rejectfab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            readTripFromFirebase(new FirebaseCallback<Trip>() {
-                                @Override
-                                public void onCallback(Trip dataItem) {
-                                    // Removing user from trip
-                                    HashMap<String, String> memberIds = dataItem.getMemberIds();
-                                    memberIds.remove(_firebaseAuth.getCurrentUser().getUid());
-                                    _tripDatabaseReference.setValue(dataItem);
-                                }
-                            });
-                            readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
-                                @Override
-                                public void onCallback(HashMap<String, HashMap<String, String>> dataItem) {
-                                    // Removing the trip from user
-                                    dataItem.remove(_tripId);
-                                    _userTripDatabaseReference.setValue(dataItem);
-                                }
-                            });
-                            finish();
-                        }
-                    });
-                } else{
-                    acceptfab.setVisibility(View.GONE);
-                    rejectfab.setVisibility(View.GONE);
+                if (dataItem != null && dataItem.get(_tripId) != null) {
+                    String tripState = dataItem.get(_tripId).get("state");
+                    if(TextUtils.equals(tripState, "pending")) {
+                        acceptfab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
+                                _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
+                            }
+                        });
+                        rejectfab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                readTripFromFirebase(new FirebaseCallback<Trip>() {
+                                    @Override
+                                    public void onCallback(Trip dataItem) {
+                                        // Removing user from trip
+                                        HashMap<String, String> memberIds = dataItem.getMemberIds();
+                                        memberIds.remove(_firebaseAuth.getCurrentUser().getUid());
+                                        _tripDatabaseReference.setValue(dataItem);
+                                    }
+                                });
+                                readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
+                                    @Override
+                                    public void onCallback(HashMap<String, HashMap<String, String>> dataItem) {
+                                        // Removing the trip from user
+                                        dataItem.remove(_tripId);
+                                        _userTripDatabaseReference.setValue(dataItem);
+                                        finish();
+                                    }
+                                });
+                            }
+                        });
+                    } else{
+                        acceptfab.setVisibility(View.GONE);
+                        rejectfab.setVisibility(View.GONE);
+                    }
                 }
             }
         });
