@@ -10,8 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,13 +44,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TripViewActivity extends FragmentActivity
-        implements OnMapReadyCallback, ItineraryAdapter.ItemClickListener {
+        implements OnMapReadyCallback {
 
     private GoogleMap _map;
     private BottomSheetBehavior _bottomSheetBehavior;
     private ItineraryAdapter _adapter;
     private DatabaseReference _tripDatabaseReference;
+    private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
+    private TextView _textViewTripName;
+    private TextView _textViewStartLocation;
+    private TextView _textViewEndLocation;
+    private RecyclerView _itineraryStops;
+
 
     private DatabaseReference _databaseRoot;
 
@@ -61,26 +70,43 @@ public class TripViewActivity extends FragmentActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        RecyclerView recyclerView = findViewById(R.id.itineraryRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        _itineraryStops = findViewById(R.id.itineraryRecyclerView);
+        _textViewTripName = findViewById(R.id.itineraryTextViewTripName);
+        _textViewStartLocation = findViewById(R.id.itineraryTextViewStartLocation);
+        _textViewEndLocation = findViewById(R.id.itineraryTextViewEndLocation);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        _itineraryStops.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(_itineraryStops.getContext(),
+                layoutManager.getOrientation());
+        _itineraryStops.addItemDecoration(dividerItemDecoration);
+
+        /*
         String[] dummy = {"Hello", "World", "Goodbye"};
         _adapter = new ItineraryAdapter(this, Arrays.asList(dummy));
         _adapter.setClickListener(this);
         recyclerView.setAdapter(_adapter);
-
-
-        _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
-
+        */
         // Initialize the tripId
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
-        // Initialize the database reference
+        // Initialize the database references
         _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripId);
+        _tripStopsDatabaseReference = _tripDatabaseReference.child("stops");
+
+        // New Adapter
+        FirebaseRecyclerOptions<Stop> options =
+                new FirebaseRecyclerOptions.Builder<Stop>()
+                        .setQuery(_tripStopsDatabaseReference, Stop.class)
+                        .build();
+
+        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference);
+
+        _itineraryStops.setAdapter(_adapter);
+        _adapter.startListening();
+        //
+
+        _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
 
         // Set the callback to read from the trip
@@ -88,16 +114,11 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onCallback(Trip dataItem) {
                 // TODO: Do stuff with the trip
-                Log.d("Trip info", dataItem.getName());
-                Log.d("Trip info", dataItem.getStart());
-                Log.d("Trip info", dataItem.getDestination());
-                Log.d("Trip info", dataItem.getStops().toString());
-                Log.d("Trip info", dataItem.getMemberIds().toString());
+                _textViewTripName.setText(dataItem.getName());
+                _textViewStartLocation.setText(dataItem.getStart());
+                _textViewEndLocation.setText(dataItem.getDestination());
             }
         });
-
-
-        // getStops();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
@@ -171,11 +192,13 @@ public class TripViewActivity extends FragmentActivity
         _map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
+    /*
     @Override
     public void onItemClick(View view, int position) {
         Toast.makeText(this, "You clicked " + _adapter.getItem(position) +
                 " on row number " + position, Toast.LENGTH_SHORT).show();
     }
+    */
 
     private void readTripFromFirebase(final FirebaseCallback<Trip> readTripCallback) {
         ValueEventListener tripEventListener = new ValueEventListener() {
@@ -211,6 +234,19 @@ public class TripViewActivity extends FragmentActivity
 
             }
         });
+    }
 
+    public static class StopsViewHolder extends RecyclerView.ViewHolder {
+
+        TextView _textViewStopName;
+        TextView _textViewStopAddress;
+        TextView _textViewStopType;
+
+        public StopsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            _textViewStopName = itemView.findViewById(R.id.textViewStopName);
+            _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
+            _textViewStopType = itemView.findViewById(R.id.textViewStopType);
+        }
     }
 }

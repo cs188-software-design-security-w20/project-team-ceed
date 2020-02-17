@@ -85,7 +85,8 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
                 getChildFragmentManager().findFragmentById(R.id.enter_start_autocomplete_fragment);
 
         // Specify the types of place data to return.
-        startAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        startAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.LAT_LNG, Place.Field.ADDRESS));
 
 
 

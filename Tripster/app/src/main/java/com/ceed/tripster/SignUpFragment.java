@@ -213,23 +213,6 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    /*private void writeUserToDatabase(final FirebaseUser user, HashMap<String, String> userMap) {
-        final String userID = user.getUid();
-        _databaseRoot.child("Users").child(userID).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d("Firebase", "Successfully wrote user " + userID + " to database");
-                    // Navigate to main page
-                    _navController.navigate(R.id.action_signUpFragment_to_mainActivity);
-                } else {
-                    Log.d("Firebase", "Failed to write user " + userID + " to database");
-                    deleteCurrentUser(user);
-                }
-            }
-        });
-    }*/
-
     private void writeUserToDatabase(final FirebaseUser user, final HashMap<String, String> userMap) {
         final String userId = user.getUid();
         _databaseRoot.child("Users").child(userId).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -238,7 +221,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                 if (task.isSuccessful()) {
                     Log.d("Firebase", "Successfully wrote user " + userId + " to database");
                     // Write user email to mapping
-                    writeUserEmailToDatabase(removePeriodsFromEmail(userMap.get("email")), user);
+                    writeUserEmailToDatabase(replacePeriodsFromEmail(userMap.get("email")), user);
                 } else {
                     Log.d("Firebase", "Failed to write user " + userId + " to database");
                     deleteCurrentUser(user);
@@ -264,7 +247,7 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private String removePeriodsFromEmail(String email) {
+    private String replacePeriodsFromEmail(String email) {
         return email.replaceAll("\\.", ",");
     }
 }
