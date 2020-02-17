@@ -127,7 +127,6 @@ public class TripViewActivity extends FragmentActivity
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
 
-
         // New Adapter
         FirebaseRecyclerOptions<Stop> options =
                 new FirebaseRecyclerOptions.Builder<Stop>()
@@ -199,12 +198,13 @@ public class TripViewActivity extends FragmentActivity
                 // Do something in response to button click
                 Log.d("tag", "Close");
                 _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-       if (_geoApiContext == null) {
-           _geoApiContext =
-                   new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
-       }
 
+            }
+        });
 
+        if (_geoApiContext == null) {
+            _geoApiContext = new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
+        }
         _databaseRoot = FirebaseDatabase.getInstance().getReference();
 
 
@@ -217,6 +217,8 @@ public class TripViewActivity extends FragmentActivity
                 p_fragment.show(manager, "addPersonFragment");
             }
         });
+
+
         final FloatingActionButton acceptfab = findViewById(R.id.acceptfab);
         final FloatingActionButton rejectfab = findViewById(R.id.rejectfab);
 
@@ -224,48 +226,46 @@ public class TripViewActivity extends FragmentActivity
         readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
             @Override
             public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
-                String tripState = dataItem.get(_tripId).get("state");
-                if(TextUtils.equals(tripState, "pending")) {
-                    acceptfab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
-                            _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
-                        }
-                    });
-                    rejectfab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            readTripFromFirebase(new FirebaseCallback<Trip>() {
-                                @Override
-                                public void onCallback(Trip dataItem) {
-                                    // Removing user from trip
-                                    HashMap<String, String> memberIds = dataItem.getMemberIds();
-                                    memberIds.remove(_firebaseAuth.getCurrentUser().getUid());
-                                    _tripDatabaseReference.setValue(dataItem);
-                                }
-                            });
-                            readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
-                                @Override
-                                public void onCallback(HashMap<String, HashMap<String, String>> dataItem) {
-                                    // Removing the trip from user
-                                    dataItem.remove(_tripId);
-                                    _userTripDatabaseReference.setValue(dataItem);
-                                }
-                            });
-                            finish();
-                        }
-                    });
-                } else{
-                    acceptfab.setVisibility(View.GONE);
-                    rejectfab.setVisibility(View.GONE);
-                }
+                if(dataItem != null){
+                    String tripState = dataItem.get(_tripId).get("state");
+                    if (TextUtils.equals(tripState, "pending")) {
+                        acceptfab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
+                                _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
+                            }
+                        });
+                        rejectfab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                readTripFromFirebase(new FirebaseCallback<Trip>() {
+                                    @Override
+                                    public void onCallback(Trip dataItem) {
+                                        // Removing user from trip
+                                        HashMap<String, String> memberIds = dataItem.getMemberIds();
+                                        memberIds.remove(_firebaseAuth.getCurrentUser().getUid());
+                                        _tripDatabaseReference.setValue(dataItem);
+                                    }
+                                });
+                                readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
+                                    @Override
+                                    public void onCallback(HashMap<String, HashMap<String, String>> dataItem) {
+                                        // Removing the trip from user
+                                        dataItem.remove(_tripId);
+                                        _userTripDatabaseReference.setValue(dataItem);
+                                    }
+                                });
+                                finish();
+                            }
+                        });
+                    } else {
+                        acceptfab.setVisibility(View.GONE);
+                        rejectfab.setVisibility(View.GONE);
+                    }}
+
             }
         });
-
-
-
-
     }
 
 
@@ -334,7 +334,7 @@ public class TripViewActivity extends FragmentActivity
         ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
 
         for (Map.Entry mapElement : stops.entrySet()) {
-            String key = (String)mapElement.getKey();
+            String key = (String) mapElement.getKey();
 
             if (((Stop) mapElement.getValue()).getType().equals("start")) {
                 _startStop = (Stop) mapElement.getValue();
@@ -345,8 +345,7 @@ public class TripViewActivity extends FragmentActivity
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Start"));
                 _map.moveCamera(CameraUpdateFactory.newLatLng(start));
-            }
-            else if (((Stop) mapElement.getValue()).getType().equals("end")) {
+            } else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
                 // Add a marker in Sydney and move the camera
                 LatLng end = new LatLng(_endStop.getLatitude(), _endStop.getLongitude());
@@ -425,16 +424,17 @@ public class TripViewActivity extends FragmentActivity
         });
     }
 
-    public void addUserToTrip(String email){
+    public void addUserToTrip(String email) {
         Log.d("TRIPVIEWACTIVITY", email);
         String adjustedEmail = email.replaceAll("\\.", ",");
 
-        ValueEventListener  listener = _databaseRoot.child("User Email to UID").child(adjustedEmail).addValueEventListener(new ValueEventListener() {
+        ValueEventListener listener = _databaseRoot.child("User Email to UID").child(adjustedEmail).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String user = dataSnapshot.getValue().toString();
-                _databaseRoot.child("Trips").child(_tripId).child("memberIds");
+                _databaseRoot.child("Trips").child(_tripId).child("memberIds").child(user).setValue("pending");
                 _databaseRoot.child("User Trips").child(user).child(_tripId).child("state").setValue("pending");
+
             }
 
             @Override
@@ -443,6 +443,7 @@ public class TripViewActivity extends FragmentActivity
             }
         });
     }
+
 
     public static class StopsViewHolder extends RecyclerView.ViewHolder {
 
@@ -458,3 +459,4 @@ public class TripViewActivity extends FragmentActivity
         }
     }
 }
+
