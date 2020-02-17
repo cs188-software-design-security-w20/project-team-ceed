@@ -39,7 +39,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
         Log.d("ADDPERSONFRAGMENT", v.toString());
         if(v.getId() == R.id.submit){
             String email = emailField.getText().toString();
-            Log.d("ADDPERSONFRAGMENT", email);
+            ((TripViewActivity) getActivity()).addUserToTrip(email);
             getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
         }
     }
