@@ -24,10 +24,16 @@
             android:text="Current Trips"/>
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/pastTripTab"
+        android:id="@+id/pastTripTab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Past Trips"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/pendingTripTab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Past Trips"/>
+            android:text="Trip Requests"/>
 
     </com.google.android.material.tabs.TabLayout>
 

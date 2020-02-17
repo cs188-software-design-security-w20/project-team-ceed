@@ -1,16 +1,80 @@
 package com.ceed.tripster;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.ViewHolder> {
+public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
+    private DatabaseReference _tripStopsDatabaseReference;
+
+    public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options, DatabaseReference tripStopsDatabaseReference){
+        super(options);
+
+        this._tripStopsDatabaseReference = tripStopsDatabaseReference;
+    }
+
+    @Override
+    protected void onBindViewHolder(@NonNull final TripViewActivity.StopsViewHolder holder, int position, @NonNull Stop model) {
+        final String listStopId = getRef(position).getKey();
+        Log.d("Firebase", "ID: "+ listStopId);
+        _tripStopsDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    final String type = dataSnapshot.child(listStopId).child("type").getValue().toString();
+                    final String stopName = dataSnapshot.child(listStopId).child("name").getValue().toString();
+                    final String stopAddress = dataSnapshot.child(listStopId).child("address").getValue().toString();
+                    Log.d("Firebase", "Stop type: " + type);
+                    Log.d("Firebase", "Stop name: " + stopName);
+                    Log.d("Firebase", "Stop address: " + stopAddress);
+                    holder._textViewStopName.setText(stopName);
+                    holder._textViewStopAddress.setText(stopAddress);
+                    if (TextUtils.equals(type, "start")) {
+                        holder._textViewStopType.setText("Start Stop");
+                        holder._textViewStopType.setVisibility(View.VISIBLE);
+                    }
+                    else if (TextUtils.equals(type, "end")) {
+                        holder._textViewStopType.setText("End Stop");
+                        holder._textViewStopType.setVisibility(View.VISIBLE);
+                    }
+                    /*
+                     */
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("Firebase", databaseError.getMessage());
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public TripViewActivity.StopsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itinerary_item, parent, false);
+        TripViewActivity.StopsViewHolder holder = new TripViewActivity.StopsViewHolder(view);
+
+        return holder;
+    }
+
+    /*
     private List<String> _data;
     private LayoutInflater _inflater;
     private ItemClickListener _clickListener;
@@ -24,7 +88,7 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.View
     // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = _inflater.inflate(R.layout.itinerary_row, parent, false);
+        View view = _inflater.inflate(R.layout.itinerary_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -48,7 +112,7 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.View
 
         ViewHolder(View itemView) {
             super(itemView);
-            myTextView = itemView.findViewById(R.id.itinerary_item);
+            myTextView = itemView.findViewById(R.id.layoutItineraryItem);
             itemView.setOnClickListener(this);
         }
 
@@ -74,4 +138,5 @@ public class ItineraryAdapter extends RecyclerView.Adapter<ItineraryAdapter.View
     public interface ItemClickListener {
         void onItemClick(View view, int position);
     }
+    */
 }

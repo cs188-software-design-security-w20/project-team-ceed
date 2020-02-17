@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -35,7 +34,6 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
     protected void onBindViewHolder(@NonNull final TripListFragment.TripsViewHolder holder, int position, @NonNull UserTrip model) {
         final String listTripId = getRef(position).getKey();
         Log.d("Firebase", "ID: "+ listTripId);
-        // TODO: This is where the logic goes to check the state of each trip
         DatabaseReference getStateRef = getRef(position).child("state").getRef();
         getStateRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -44,10 +42,7 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
                     holder._layoutTripListItem.setVisibility(View.VISIBLE);
                     holder._layoutTripListItem.getChildAt(0).setVisibility(View.VISIBLE);
                     String type = dataSnapshot.getValue().toString();
-                    Log.d("Firebase", "snapshot type: " + type);
-                    Log.d("Firebase", "tab state: " + _tabState);
                     if (TextUtils.equals(type, _tabState)) {
-                        Log.d("Firebase", "tab state == snapshot type");
                         _tripsDatabaseReference.child(listTripId).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -84,9 +79,8 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
         holder._layoutTripListItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("TRIPLIST FRAGMENT", "onClick: " + holder._tripID);
+                Log.d("TripList", "onClick: " + holder._tripID);
                 TripListFragmentDirections.ActionTripListFragment2ToTripView action = TripListFragmentDirections.actionTripListFragment2ToTripView(holder._tripID);
-                //action.setMessage(holder._tripID);
                 _navController.navigate(action);
             }
         });

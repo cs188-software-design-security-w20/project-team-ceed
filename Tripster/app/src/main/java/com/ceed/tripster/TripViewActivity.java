@@ -3,6 +3,7 @@ package com.ceed.tripster;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,8 +13,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,6 +37,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,18 +59,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TripViewActivity extends FragmentActivity
-        implements OnMapReadyCallback, ItineraryAdapter.ItemClickListener {
+        implements OnMapReadyCallback {
 
     private GoogleMap _map;
     private BottomSheetBehavior _bottomSheetBehavior;
     private ItineraryAdapter _adapter;
     private DatabaseReference _tripDatabaseReference;
+    private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
-    private Trip _trip;
-    private HashMap<String, Stop> _stops;
+
     private Stop _startStop;
     private Stop _endStop;
     private GeoApiContext _geoApiContext;
+
+    private TextView _textViewTripName;
+    private TextView _textViewStartLocation;
+    private TextView _textViewEndLocation;
+    private RecyclerView _itineraryStops;
+
+    private DatabaseReference _databaseRoot;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,26 +89,45 @@ public class TripViewActivity extends FragmentActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        RecyclerView recyclerView = findViewById(R.id.itineraryRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        _itineraryStops = findViewById(R.id.itineraryRecyclerView);
+        _textViewTripName = findViewById(R.id.itineraryTextViewTripName);
+        _textViewStartLocation = findViewById(R.id.itineraryTextViewStartLocation);
+        _textViewEndLocation = findViewById(R.id.itineraryTextViewEndLocation);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        _itineraryStops.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(_itineraryStops.getContext(),
+                layoutManager.getOrientation());
+        _itineraryStops.addItemDecoration(dividerItemDecoration);
+
+        /*
         String[] dummy = {"Hello", "World", "Goodbye"};
         _adapter = new ItineraryAdapter(this, Arrays.asList(dummy));
         _adapter.setClickListener(this);
         recyclerView.setAdapter(_adapter);
+        */
 
-
-        _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
         // Initialize the tripId
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
-        // Initialize the database reference
+        // Initialize the database references
         _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripId);
+        _tripStopsDatabaseReference = _tripDatabaseReference.child("stops");
+
+        // New Adapter
+        FirebaseRecyclerOptions<Stop> options =
+                new FirebaseRecyclerOptions.Builder<Stop>()
+                        .setQuery(_tripStopsDatabaseReference, Stop.class)
+                        .build();
+
+        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference);
+
+        _itineraryStops.setAdapter(_adapter);
+        _adapter.startListening();
+        //
+
+        _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
 
         // Set the callback to read from the trip
@@ -108,14 +140,13 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getDestination());
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
-                setTrip(dataItem);
                 setStops(dataItem.getStops());
 
+                _textViewTripName.setText(dataItem.getName());
+                _textViewStartLocation.setText(dataItem.getStart());
+                _textViewEndLocation.setText(dataItem.getDestination());
             }
         });
-
-
-        // getStops();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
@@ -151,7 +182,21 @@ public class TripViewActivity extends FragmentActivity
            _geoApiContext =
                    new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
        }
+
+
+        _databaseRoot = FirebaseDatabase.getInstance().getReference();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager manager = getSupportFragmentManager();
+                addPersonFragment p_fragment = new addPersonFragment();
+                p_fragment.show(manager, "addPersonFragment");
+            }
+        });
     }
+
 
     /**
      * Manipulates the map once available.
@@ -168,11 +213,13 @@ public class TripViewActivity extends FragmentActivity
 
     }
 
+    /*
     @Override
     public void onItemClick(View view, int position) {
         Toast.makeText(this, "You clicked " + _adapter.getItem(position) +
                 " on row number " + position, Toast.LENGTH_SHORT).show();
     }
+    */
 
     private void readTripFromFirebase(final FirebaseCallback<Trip> readTripCallback) {
         ValueEventListener tripEventListener = new ValueEventListener() {
@@ -191,13 +238,8 @@ public class TripViewActivity extends FragmentActivity
         _tripDatabaseReference.addValueEventListener(tripEventListener);
     }
 
-    private void setTrip(Trip trip) {
-        _trip = trip;
-        Log.d("ay", _trip.getName());
-    }
 
     private void setStops(HashMap<String, Stop> stops) {
-        _stops = stops;
 
         ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
 
@@ -265,14 +307,14 @@ public class TripViewActivity extends FragmentActivity
             public void onResult(final DirectionsResult result) {
                 new Handler(Looper.getMainLooper()).post(() -> {
 
-                    for(DirectionsRoute route: result.routes){
+                    for (DirectionsRoute route : result.routes) {
                         List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
 
                         List<LatLng> newDecodedPath = new ArrayList<>();
 
                         // This loops through all the LatLng coordinates of ONE polyline.
-                        for(com.google.maps.model.LatLng latLng: decodedPath){
+                        for (com.google.maps.model.LatLng latLng : decodedPath) {
 
                             newDecodedPath.add(new LatLng(
                                     latLng.lat,
@@ -292,5 +334,38 @@ public class TripViewActivity extends FragmentActivity
 
             }
         });
+    }
+
+    public void addUserToTrip(String email){
+        Log.d("TRIPVIEWACTIVITY", email);
+        String adjustedEmail = email.replaceAll("\\.", ",");
+
+        ValueEventListener  listener = _databaseRoot.child("User Email to UID").child(adjustedEmail).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String user = dataSnapshot.getValue().toString();
+                _databaseRoot.child("Trips").child(_tripId).child("memberIds").child(user).setValue("pending");
+                _databaseRoot.child("User Trips").child(user).child(_tripId).child("state").setValue("pending");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public static class StopsViewHolder extends RecyclerView.ViewHolder {
+
+        TextView _textViewStopName;
+        TextView _textViewStopAddress;
+        TextView _textViewStopType;
+
+        public StopsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            _textViewStopName = itemView.findViewById(R.id.textViewStopName);
+            _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
+            _textViewStopType = itemView.findViewById(R.id.textViewStopType);
+        }
     }
 }
