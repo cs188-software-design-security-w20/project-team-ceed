@@ -105,7 +105,7 @@ public class TripViewActivity extends FragmentActivity
         // New Adapter
         FirebaseRecyclerOptions<Stop> options =
                 new FirebaseRecyclerOptions.Builder<Stop>()
-                        .setQuery(_tripStopsDatabaseReference, Stop.class)
+                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
                         .build();
 
         _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference);
