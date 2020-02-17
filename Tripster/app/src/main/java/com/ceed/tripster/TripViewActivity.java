@@ -1,12 +1,15 @@
 package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -18,6 +21,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -32,7 +37,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,6 +58,11 @@ public class TripViewActivity extends FragmentActivity
     private ItineraryAdapter _adapter;
     private DatabaseReference _tripDatabaseReference;
     private String _tripId;
+    private Trip _trip;
+    private HashMap<String, Stop> _stops;
+    private Stop _startStop;
+    private Stop _endStop;
+    private GeoApiContext _geoApiContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +105,9 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getDestination());
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
+                setTrip(dataItem);
+                setStops(dataItem.getStops());
+
             }
         });
 
@@ -124,15 +144,10 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
-        View searchCard = findViewById(R.id.serach_card_view);
-        searchCard.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Do something in response to button click
-                Log.d("tag", "Close");
-                _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
-            }
-        });
+       if (_geoApiContext == null) {
+           _geoApiContext =
+                   new GeoApiContext.Builder().apiKey(getString(R.string.google_api_key)).build();
+       }
     }
 
     /**
@@ -175,5 +190,82 @@ public class TripViewActivity extends FragmentActivity
         };
 
         _tripDatabaseReference.addValueEventListener(tripEventListener);
+    }
+
+    private void setTrip(Trip trip) {
+        _trip = trip;
+        Log.d("ay", _trip.getName());
+    }
+
+    private void setStops(HashMap<String, Stop> stops) {
+        _stops = stops;
+        for (Map.Entry mapElement : stops.entrySet()) {
+            String key = (String)mapElement.getKey();
+
+            if (((Stop) mapElement.getValue()).getType().equals("start")) {
+                _startStop = (Stop) mapElement.getValue();
+            }
+
+            if (((Stop) mapElement.getValue()).getType().equals("end")) {
+                _endStop = (Stop) mapElement.getValue();
+            }
+
+
+        }
+
+        createRoute();
+    }
+
+    private void createRoute() {
+
+
+        com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
+                _endStop.getLatitude(),
+                _endStop.getLongitude()
+        );
+        DirectionsApiRequest directions = new DirectionsApiRequest(_geoApiContext);
+
+        directions.alternatives(true);
+        directions.origin(
+                new com.google.maps.model.LatLng(
+                        _startStop.getLatitude(),
+                        _startStop.getLongitude()
+                )
+        );
+
+        directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(final DirectionsResult result) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        for(DirectionsRoute route: result.routes){
+                            List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+
+                            List<LatLng> newDecodedPath = new ArrayList<>();
+
+                            // This loops through all the LatLng coordinates of ONE polyline.
+                            for(com.google.maps.model.LatLng latLng: decodedPath){
+
+                                newDecodedPath.add(new LatLng(
+                                        latLng.lat,
+                                        latLng.lng
+                                ));
+                            }
+                            Polyline polyline = _map.addPolyline(new PolylineOptions().addAll(newDecodedPath));
+                            polyline.setClickable(true);
+
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                Log.e("boo", "calculateDirections: Failed to get directions: " + e.getMessage());
+
+            }
+        });
     }
 }
