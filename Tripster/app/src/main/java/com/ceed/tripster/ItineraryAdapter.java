@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
@@ -34,16 +36,14 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
     protected void onBindViewHolder(@NonNull final TripViewActivity.StopsViewHolder holder, int position, @NonNull Stop model) {
         final String listStopId = getRef(position).getKey();
         Log.d("Firebase", "ID: "+ listStopId);
-        _tripStopsDatabaseReference.addValueEventListener(new ValueEventListener() {
+        _tripStopsDatabaseReference.orderByChild("index").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     final String type = dataSnapshot.child(listStopId).child("type").getValue().toString();
                     final String stopName = dataSnapshot.child(listStopId).child("name").getValue().toString();
                     final String stopAddress = dataSnapshot.child(listStopId).child("address").getValue().toString();
-                    Log.d("Firebase", "Stop type: " + type);
-                    Log.d("Firebase", "Stop name: " + stopName);
-                    Log.d("Firebase", "Stop address: " + stopAddress);
+
                     holder._textViewStopName.setText(stopName);
                     holder._textViewStopAddress.setText(stopAddress);
                     if (TextUtils.equals(type, "start")) {
@@ -54,8 +54,6 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                         holder._textViewStopType.setText("End Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
                     }
-                    /*
-                     */
                 }
             }
             @Override

@@ -151,10 +151,10 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
 
         // Initializing stops
         Stop startStop = new Stop(_startPlace.getName(), "start", _startPlace.getAddress(),
-                _startPlace.getLatLng().latitude, _startPlace.getLatLng().longitude);
+                _startPlace.getLatLng().latitude, _startPlace.getLatLng().longitude, 0);
 
         Stop endStop = new Stop(_endPlace.getName(), "end", _endPlace.getAddress(),
-                _endPlace.getLatLng().latitude, _endPlace.getLatLng().longitude);
+                _endPlace.getLatLng().latitude, _endPlace.getLatLng().longitude, 1);
 
         HashMap<String, Stop> stops = new HashMap<>();
 

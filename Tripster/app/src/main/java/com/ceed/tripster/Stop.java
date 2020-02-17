@@ -10,17 +10,19 @@ public class Stop {
     private double latitude;
     private double longitude;
 
+    private int index;
 
     public Stop() {
 
     }
 
-    public Stop(String name, String type, String address, double latitude, double longitude) {
+    public Stop(String name, String type, String address, double latitude, double longitude, int index) {
         this.name = name;
         this.type = type;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.index = index;
     }
 
     public Stop(Stop c) {
@@ -29,6 +31,7 @@ public class Stop {
         this.address  = c.address;
         this.latitude = c.latitude;
         this.longitude = c.longitude;
+        this.index = c.index;
     }
 
     public String getName() {
@@ -70,5 +73,9 @@ public class Stop {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public int getIndex() { return index; }
+
+    public void setIndex(int index) { this.index = index; }
 
 }
