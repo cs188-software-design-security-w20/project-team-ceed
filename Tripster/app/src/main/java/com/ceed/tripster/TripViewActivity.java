@@ -19,6 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -45,6 +46,8 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -146,7 +149,7 @@ public class TripViewActivity extends FragmentActivity
 
        if (_geoApiContext == null) {
            _geoApiContext =
-                   new GeoApiContext.Builder().apiKey(getString(R.string.google_api_key)).build();
+                   new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
        }
     }
 
@@ -163,10 +166,6 @@ public class TripViewActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
         _map = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        _map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        _map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override
@@ -199,30 +198,53 @@ public class TripViewActivity extends FragmentActivity
 
     private void setStops(HashMap<String, Stop> stops) {
         _stops = stops;
+
+        ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
+
         for (Map.Entry mapElement : stops.entrySet()) {
             String key = (String)mapElement.getKey();
 
             if (((Stop) mapElement.getValue()).getType().equals("start")) {
                 _startStop = (Stop) mapElement.getValue();
-            }
 
-            if (((Stop) mapElement.getValue()).getType().equals("end")) {
+                // Add a marker in Sydney and move the camera
+                LatLng start = new LatLng(_startStop.getLatitude(), _startStop.getLongitude());
+                _map.addMarker(new MarkerOptions().position(start).title(_startStop.getName())
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Start"));
+                _map.moveCamera(CameraUpdateFactory.newLatLng(start));
+            }
+            else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
+                // Add a marker in Sydney and move the camera
+                LatLng end = new LatLng(_endStop.getLatitude(), _endStop.getLongitude());
+                _map.addMarker(new MarkerOptions().position(end).title(_endStop.getName())
+                        .snippet("Destination"));
+            } else {
+                Stop stop = ((Stop) mapElement.getValue());
+                LatLng stopLatLng = new LatLng(stop.getLatitude(),
+                        stop.getLongitude());
+                wayPoints.add(new com.google.maps.model.LatLng(stopLatLng.latitude, stopLatLng.longitude));
+
+                _map.addMarker(new MarkerOptions().position(stopLatLng).title(stop.getName())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+
             }
 
 
         }
 
-        createRoute();
+
+        createRoute(wayPoints);
     }
 
-    private void createRoute() {
-
+    private void createRoute(ArrayList<com.google.maps.model.LatLng> wayPoints) {
 
         com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
                 _endStop.getLatitude(),
                 _endStop.getLongitude()
         );
+
         DirectionsApiRequest directions = new DirectionsApiRequest(_geoApiContext);
 
         directions.alternatives(true);
@@ -233,30 +255,33 @@ public class TripViewActivity extends FragmentActivity
                 )
         );
 
+
+        if (wayPoints.size() != 0) {
+            directions.waypoints(wayPoints.toArray(new com.google.maps.model.LatLng[0]));
+        }
+
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
             public void onResult(final DirectionsResult result) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
+                new Handler(Looper.getMainLooper()).post(() -> {
 
-                        for(DirectionsRoute route: result.routes){
-                            List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+                    for(DirectionsRoute route: result.routes){
+                        List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
-                            List<LatLng> newDecodedPath = new ArrayList<>();
 
-                            // This loops through all the LatLng coordinates of ONE polyline.
-                            for(com.google.maps.model.LatLng latLng: decodedPath){
+                        List<LatLng> newDecodedPath = new ArrayList<>();
 
-                                newDecodedPath.add(new LatLng(
-                                        latLng.lat,
-                                        latLng.lng
-                                ));
-                            }
-                            Polyline polyline = _map.addPolyline(new PolylineOptions().addAll(newDecodedPath));
-                            polyline.setClickable(true);
+                        // This loops through all the LatLng coordinates of ONE polyline.
+                        for(com.google.maps.model.LatLng latLng: decodedPath){
 
+                            newDecodedPath.add(new LatLng(
+                                    latLng.lat,
+                                    latLng.lng
+                            ));
                         }
+                        Polyline polyline = _map.addPolyline(new PolylineOptions().addAll(newDecodedPath));
+                        polyline.setClickable(true);
+
                     }
                 });
             }
