@@ -90,6 +90,8 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == _buttonRegister) {
+            Log.d("SIGNUP", "Button clicked");
+            //_navController.navigate(R.id.action_signUpFragment_to_mainActivity);
             registerUser();
         } else if (view == _textViewLogin) {
             // open sign-in activity

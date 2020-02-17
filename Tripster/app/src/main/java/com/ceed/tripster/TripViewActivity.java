@@ -2,6 +2,7 @@ package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +31,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,6 +56,9 @@ public class TripViewActivity extends FragmentActivity
     private TextView _textViewStartLocation;
     private TextView _textViewEndLocation;
     private RecyclerView _itineraryStops;
+
+
+    private DatabaseReference _databaseRoot;
 
 
     @Override
@@ -154,7 +159,9 @@ public class TripViewActivity extends FragmentActivity
 
             }
         });
+        _databaseRoot = FirebaseDatabase.getInstance().getReference();
     }
+
 
     /**
      * Manipulates the map once available.
@@ -200,6 +207,25 @@ public class TripViewActivity extends FragmentActivity
         _tripDatabaseReference.addValueEventListener(tripEventListener);
     }
 
+    public void addUserToTrip(String email){
+        Log.d("TRIPVIEWACTIVITY", email);
+        String adjustedEmail = email.replaceAll("\\.", ",");
+
+        ValueEventListener  listener = _databaseRoot.child("User Email to UID").child(adjustedEmail).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String user = dataSnapshot.getValue().toString();
+                _databaseRoot.child("Trips").child(_tripId).child("memberIds").child(user).setValue("pending");
+                _databaseRoot.child("User Trips").child(user).child(_tripId).child("state").setValue("pending");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public static class StopsViewHolder extends RecyclerView.ViewHolder {
 
         TextView _textViewStopName;
@@ -212,7 +238,5 @@ public class TripViewActivity extends FragmentActivity
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
         }
-
-
     }
 }
