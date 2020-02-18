@@ -25,11 +25,25 @@ import java.util.List;
 
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
     private DatabaseReference _tripStopsDatabaseReference;
+    private String _tripId;
 
-    public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options, DatabaseReference tripStopsDatabaseReference){
+    public interface DeleteStopCallBack {
+        void onStopDeleted(String placeId);
+    }
+
+    private DeleteStopCallBack _deleteStopCallBack;
+
+
+
+
+    public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options, String tripId,
+                            DatabaseReference tripStopsDatabaseReference,
+                            DeleteStopCallBack deleteStopCallBack){
         super(options);
 
         this._tripStopsDatabaseReference = tripStopsDatabaseReference;
+        _tripId = tripId;
+        _deleteStopCallBack = deleteStopCallBack;
     }
 
     @Override
@@ -39,23 +53,28 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
         _tripStopsDatabaseReference.orderByChild("index").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    final String type = dataSnapshot.child(listStopId).child("type").getValue().toString();
+                if (dataSnapshot.exists() && dataSnapshot.child(listStopId).child("name").getValue() != null) {
                     final String stopName = dataSnapshot.child(listStopId).child("name").getValue().toString();
+                    final String type = dataSnapshot.child(listStopId).child("type").getValue().toString();
                     final String stopAddress = dataSnapshot.child(listStopId).child("address").getValue().toString();
 
                     holder._textViewStopName.setText(stopName);
                     holder._textViewStopAddress.setText(stopAddress);
+                    holder._placeId = listStopId;
+
                     if (TextUtils.equals(type, "start")) {
                         holder._textViewStopType.setText("Start Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
+                        holder._imageButton.setVisibility(View.GONE);
                     }
                     else if (TextUtils.equals(type, "end")) {
                         holder._textViewStopType.setText("End Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
+                        holder._imageButton.setVisibility(View.GONE);
                     } else {
                         holder._textViewStopType.setText("");
                         holder._textViewStopType.setVisibility(View.GONE);
+                        holder._imageButton.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -70,7 +89,9 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
     @Override
     public TripViewActivity.StopsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itinerary_item, parent, false);
-        TripViewActivity.StopsViewHolder holder = new TripViewActivity.StopsViewHolder(view);
+
+        TripViewActivity.StopsViewHolder holder =
+                new TripViewActivity.StopsViewHolder(view, _deleteStopCallBack);
 
         return holder;
     }
