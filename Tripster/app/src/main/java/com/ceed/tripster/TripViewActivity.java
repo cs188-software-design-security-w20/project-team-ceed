@@ -190,7 +190,7 @@ public class TripViewActivity extends FragmentActivity
 
                 // Waypoints.size() + 2 to get to end of list
                 Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
-                        place.getLatLng().latitude, place.getLatLng().longitude, _wayPoints.size() + 2);
+                        place.getLatLng().latitude, place.getLatLng().longitude, _wayPoints.size() + 1);
 
                 _endStop.setIndex(_endStop.getIndex() + 1);
                 _trip.getStops().put(_endStopPlaceId, _endStop);
@@ -494,7 +494,15 @@ public class TripViewActivity extends FragmentActivity
 
     @Override
     public void onStopDeleted(String placeId) {
-        HashMap<String, Stop> stops= _trip.getStops();
+        HashMap<String, Stop> stops = _trip.getStops();
+
+        for(String key: stops.keySet()) {
+            int index = stops.get(key).getIndex();
+            if (index > stops.get(placeId).getIndex()){
+                stops.get(key).setIndex(index - 1);
+            }
+        }
+
         stops.remove(placeId);
 
         _trip.setStops(stops);
