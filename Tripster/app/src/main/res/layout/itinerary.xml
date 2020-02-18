@@ -46,7 +46,7 @@
                 android:text="Start Location"
                 android:textColor="@android:color/white"
                 android:textAlignment="textStart"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
 
             <TextView
@@ -56,7 +56,16 @@
                 android:text="End Location"
                 android:textColor="@android:color/white"
                 android:textAlignment="textStart"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/itineraryTextViewTripStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:textAlignment="textStart"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"/>
 
         </LinearLayout>
 
@@ -69,6 +78,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/endTripButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="End Trip" />
 
 
 </LinearLayout>
