@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.os.Handler;
@@ -67,6 +68,7 @@ public class TripViewActivity extends FragmentActivity
     private String _endStopPlaceId;
     private ArrayList<com.google.maps.model.LatLng> _wayPoints;
     private GeoApiContext _geoApiContext;
+    private Polyline _routePolyline;
 
     private TextView _textViewTripName;
     private TextView _textViewStartLocation;
@@ -177,11 +179,6 @@ public class TripViewActivity extends FragmentActivity
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i("TAG", "Place: " + place.getName() + ", " + place.getId());
-                // Add a marker in Sydney and move the camera
-
-
 
                 _map.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName())
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
@@ -399,7 +396,7 @@ public class TripViewActivity extends FragmentActivity
 
         DirectionsApiRequest directions = new DirectionsApiRequest(_geoApiContext);
 
-        directions.alternatives(true);
+        directions.alternatives(false);
         directions.origin(
                 new com.google.maps.model.LatLng(
                         _startStop.getLatitude(),
@@ -417,24 +414,28 @@ public class TripViewActivity extends FragmentActivity
             public void onResult(final DirectionsResult result) {
                 new Handler(Looper.getMainLooper()).post(() -> {
 
-                    for (DirectionsRoute route : result.routes) {
-                        List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+                    DirectionsRoute route = result.routes[0];
+                    List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
 
-                        List<LatLng> newDecodedPath = new ArrayList<>();
+                    List<LatLng> newDecodedPath = new ArrayList<>();
 
-                        // This loops through all the LatLng coordinates of ONE polyline.
-                        for (com.google.maps.model.LatLng latLng : decodedPath) {
+                    // This loops through all the LatLng coordinates of ONE polyline.
+                    for (com.google.maps.model.LatLng latLng : decodedPath) {
 
-                            newDecodedPath.add(new LatLng(
-                                    latLng.lat,
-                                    latLng.lng
-                            ));
-                        }
-                        Polyline polyline = _map.addPolyline(new PolylineOptions().addAll(newDecodedPath));
-                        polyline.setClickable(true);
-
+                        newDecodedPath.add(new LatLng(
+                                latLng.lat,
+                                latLng.lng
+                        ));
                     }
+                    if (_routePolyline != null) {
+                        _routePolyline.remove();
+                    }
+                    _routePolyline = _map.addPolyline(
+                            new PolylineOptions().addAll(newDecodedPath).color(Color.argb(200,82, 136, 242)));
+                    _routePolyline.setClickable(true);
+
+
                 });
             }
 
@@ -466,6 +467,15 @@ public class TripViewActivity extends FragmentActivity
         });
     }
 
+    private void writeStopToDatabase(String placeId, Stop stop) {
+        HashMap<String, Stop> stops= _trip.getStops();
+        stops.put(placeId, stop);
+
+        _trip.setStops(stops);
+
+        _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
+    }
+
 
     public static class StopsViewHolder extends RecyclerView.ViewHolder {
 
@@ -481,13 +491,6 @@ public class TripViewActivity extends FragmentActivity
         }
     }
 
-    private void writeStopToDatabase(String placeId, Stop stop) {
-        HashMap<String, Stop> stops= _trip.getStops();
-        stops.put(placeId, stop);
 
-        _trip.setStops(stops);
-
-        _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
-    }
 }
 
