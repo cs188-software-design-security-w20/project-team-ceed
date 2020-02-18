@@ -1,6 +1,7 @@
 package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -71,6 +73,7 @@ public class TripViewActivity extends FragmentActivity
     private TextView _textViewTripName;
     private TextView _textViewStartLocation;
     private TextView _textViewEndLocation;
+    private TextView _textViewTripStatus;
     private RecyclerView _itineraryStops;
     private FirebaseAuth _firebaseAuth;
 
@@ -110,6 +113,8 @@ public class TripViewActivity extends FragmentActivity
         _textViewTripName = findViewById(R.id.itineraryTextViewTripName);
         _textViewStartLocation = findViewById(R.id.itineraryTextViewStartLocation);
         _textViewEndLocation = findViewById(R.id.itineraryTextViewEndLocation);
+        _textViewTripStatus = findViewById(R.id.itineraryTextViewTripStatus);
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         _itineraryStops.setLayoutManager(layoutManager);
@@ -236,6 +241,15 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
+        Button endTripButton = findViewById(R.id.endTripButton);
+        endTripButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _userTripDatabaseReference.child(_tripId).child("state").setValue("inactive");
+                _tripDatabaseReference.child("memberIds").child(_userId).setValue("inactive");
+            }
+        });
+
 
         final FloatingActionButton acceptfab = findViewById(R.id.acceptfab);
         final FloatingActionButton rejectfab = findViewById(R.id.rejectfab);
@@ -246,8 +260,14 @@ public class TripViewActivity extends FragmentActivity
             public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
                 if (dataItem != null && dataItem.get(_tripId) != null) {
                     String tripState = dataItem.get(_tripId).get("state");
-                    if(TextUtils.equals(tripState, "pending")) {
+                    if(TextUtils.equals(tripState, "inactive")){
+                        _textViewTripStatus.setText("Ended");
+                    } else if(TextUtils.equals(tripState, "active")){
+                        _textViewTripStatus.setText("In Progress");
+                    }
 
+                    if(TextUtils.equals(tripState, "pending")) {
+                        _textViewTripStatus.setText("Pending");
                         acceptfab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
