@@ -19,7 +19,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +39,10 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     private EditText _editTextEmailLogIn;
     private EditText _editTextPasswordLogIn;
     private TextView _textViewRegister;
+
+    private String captchaSiteKey = "6Le8z9UUAAAAALkZDnjTgDn7Hcxw8xvuPSHmj97W";
+    private Integer MAX_TRIES = 3;
+    private Integer _attempts = 0;
 
     private ProgressBar _progressBarRegister;
 
@@ -77,12 +87,58 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (view == _buttonLogIn) {
+        if (view == _buttonLogIn && _attempts < MAX_TRIES) {
             logIn();
-        } else if (view == _textViewRegister) {
+        } else if (view == _buttonLogIn && _attempts >= MAX_TRIES) {
+            captcha();
+        }
+        else if (view == _textViewRegister) {
             // open sign-in activity
             _navController.navigate(R.id.action_logInFragment_to_signUpFragment);
         }
+    }
+
+    private void captcha() {
+        SafetyNet.getClient(_context).verifyWithRecaptcha(captchaSiteKey)
+                .addOnSuccessListener((Activity) _context,
+                        new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
+                            @Override
+                            public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
+                                // Indicates communication with reCAPTCHA service was
+                                // successful.
+                                String userResponseToken = response.getTokenResult();
+                                if (!userResponseToken.isEmpty()) {
+                                    // Validate the user response token using the
+                                    // reCAPTCHA siteverify API.
+                                }
+                                logIn();
+                            }
+                        })
+                .addOnFailureListener((Activity) _context, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (e instanceof ApiException) {
+                            // An error occurred when communicating with the
+                            // reCAPTCHA service. Refer to the status code to
+                            // handle the error appropriately.
+                            ApiException apiException = (ApiException) e;
+                            int statusCode = apiException.getStatusCode();
+                            Toast.makeText(
+                                    _context,
+                                    "Error: " + CommonStatusCodes
+                                            .getStatusCodeString(statusCode),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        } else {
+                            // A different, unknown type of error occurred.
+                            Toast.makeText(
+                                    _context,
+                                    "Error: " + e.getMessage(),
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+                });
     }
 
     private void logIn() {
@@ -111,6 +167,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                                     _navController.navigate(R.id.action_logInFragment_to_mainActivity);
                                     ((Activity) _context).finish();
                                     //startActivity(new Intent(getActivity(), MainActivity.class));
+                                    _attempts = 0;
                                 } else {
                                     if (task.getException() != null) {
                                         Toast.makeText(
@@ -126,12 +183,11 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                                                 Toast.LENGTH_SHORT
                                         ).show();
                                     }
-
+                                    _attempts += 1;
                                 }
                                 _progressBarRegister.setVisibility(View.GONE);
                             }
                         });
-
 
     }
 
