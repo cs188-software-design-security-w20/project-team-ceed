@@ -1,16 +1,12 @@
 package com.ceed.tripster;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.NavController;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -19,31 +15,28 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
     private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
 
-    public interface DeleteStopCallBack {
+    public interface OnItemClickedCallBack {
         void onStopDeleted(String placeId);
+        void onItemClicked(String placeId);
     }
 
-    private DeleteStopCallBack _deleteStopCallBack;
+    private OnItemClickedCallBack _onItemClickedCallBack;
 
 
 
 
     public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options, String tripId,
                             DatabaseReference tripStopsDatabaseReference,
-                            DeleteStopCallBack deleteStopCallBack){
+                            OnItemClickedCallBack onItemClickedCallBack){
         super(options);
 
         this._tripStopsDatabaseReference = tripStopsDatabaseReference;
         _tripId = tripId;
-        _deleteStopCallBack = deleteStopCallBack;
+        _onItemClickedCallBack = onItemClickedCallBack;
     }
 
     @Override
@@ -91,7 +84,7 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itinerary_item, parent, false);
 
         TripViewActivity.StopsViewHolder holder =
-                new TripViewActivity.StopsViewHolder(view, _deleteStopCallBack);
+                new TripViewActivity.StopsViewHolder(view, _onItemClickedCallBack);
 
         return holder;
     }

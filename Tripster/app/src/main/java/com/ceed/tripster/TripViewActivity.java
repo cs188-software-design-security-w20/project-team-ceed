@@ -1,7 +1,6 @@
 package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -17,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -55,10 +55,9 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class TripViewActivity extends FragmentActivity
-        implements OnMapReadyCallback, ItineraryAdapter.DeleteStopCallBack {
+        implements OnMapReadyCallback, ItineraryAdapter.OnItemClickedCallBack {
 
     private GoogleMap _map;
     private BottomSheetBehavior _bottomSheetBehavior;
@@ -71,7 +70,7 @@ public class TripViewActivity extends FragmentActivity
     private Stop _startStop;
     private Stop _endStop;
     private String _endStopPlaceId;
-    private HashMap<String, com.google.maps.model.LatLng> _wayPoints;
+    private HashMap<String, com.google.maps.model.LatLng> _wayPoints = new HashMap<>();
     private GeoApiContext _geoApiContext;
     private Polyline _routePolyline;
     private HashMap<String, Marker> _markers = new HashMap<>();
@@ -157,6 +156,8 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getStops().toString());
                 Log.d("Trip info", dataItem.getMemberIds().toString());
 
+
+                _map.clear();
                 _wayPoints = setStops(dataItem.getStops());
                 createRoute();
 
@@ -199,6 +200,11 @@ public class TripViewActivity extends FragmentActivity
                 _wayPoints.put(place.getId(), new com.google.maps.model.LatLng(place.getLatLng().latitude,
                         place.getLatLng().longitude));
                 createRoute();
+
+                _map.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),4f));
+
+                // The marker will get created in setStops() which is called in readTripFromFirebase
+
             }
 
             @Override
@@ -379,7 +385,10 @@ public class TripViewActivity extends FragmentActivity
                 _markers.put(key, _map.addMarker(new MarkerOptions().position(start).title(_startStop.getName())
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Start")));
-                _map.moveCamera(CameraUpdateFactory.newLatLng(start));
+                // Only zoom in on start marker if trip view was just opened.
+                if(_wayPoints.size() == 0){
+                    _map.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 3.5f));
+                }
             } else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
                 _endStopPlaceId = (String) mapElement.getKey();
@@ -503,6 +512,7 @@ public class TripViewActivity extends FragmentActivity
             }
         }
 
+
         stops.remove(placeId);
 
         _trip.setStops(stops);
@@ -512,8 +522,19 @@ public class TripViewActivity extends FragmentActivity
         _markers.get(placeId).remove();
         _markers.remove(placeId);
 
+
         _wayPoints.remove(placeId);
         createRoute();
+    }
+
+    @Override
+    public void onItemClicked(String placeId) {
+        Marker marker = _markers.get(placeId);
+        marker.showInfoWindow();
+        _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+        _map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),5));
+
     }
 
 
@@ -523,32 +544,36 @@ public class TripViewActivity extends FragmentActivity
         TextView _textViewStopAddress;
         TextView _textViewStopType;
         ImageButton _imageButton;
+        LinearLayout _listItem;
         String _placeId;
-        ItineraryAdapter.DeleteStopCallBack _onDeleteStopCallBack;
+        ItineraryAdapter.OnItemClickedCallBack _onOnItemClickedCallBack;
 
 
 
         public StopsViewHolder(@NonNull View itemView,
-                               ItineraryAdapter.DeleteStopCallBack deleteStopCallBack) {
+                               ItineraryAdapter.OnItemClickedCallBack onItemClickedCallBack) {
             super(itemView);
             _textViewStopName = itemView.findViewById(R.id.textViewStopName);
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
             _imageButton = itemView.findViewById(R.id.delete_stop_button);
             _imageButton.setOnClickListener(this);
-            _onDeleteStopCallBack = deleteStopCallBack;
+            _listItem = itemView.findViewById(R.id.horizontal_layout);
+            _listItem.setOnClickListener(this);
+            _onOnItemClickedCallBack = onItemClickedCallBack;
         }
 
         @Override
         public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.delete_stop_button:
-                    _onDeleteStopCallBack.onStopDeleted(_placeId);
-                    break;
-                default:
-                    break;
-            }
+            Log.v("click", "click");
+
+                if(view.getId() ==  R.id.delete_stop_button) {
+                    _onOnItemClickedCallBack.onStopDeleted(_placeId);
+                } else {
+                    _onOnItemClickedCallBack.onItemClicked(_placeId);
+                }
         }
+
     }
 
 
