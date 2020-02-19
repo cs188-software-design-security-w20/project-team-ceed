@@ -10,7 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="15dp"
-        android:orientation="horizontal">
+        android:id="@+id/horizontal_layout"
+        android:orientation="horizontal"
+        android:clickable="true"
+        >
+
+
 
 
         <LinearLayout
@@ -53,12 +58,26 @@
                 android:visibility="gone"
                 />
 
+
+
         </LinearLayout>
+
 
 
 
     </LinearLayout>
 
-
+    <ImageButton
+        android:id="@+id/delete_stop_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_remove_circle_outline_black_36dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
+        android:scaleX=".75"
+        android:scaleY=".75"
+        android:background="@android:color/white"
+        />
 
 </RelativeLayout>
