@@ -41,7 +41,7 @@
         android:src="@drawable/ic_group_add_black_24dp"
         app:tint="@android:color/white" />
 
-    <include layout="@layout/fragment_add_person" android:visibility="gone"></include>
+    <include layout="@layout/fragment_add_person" android:visibility="gone"/>
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -54,7 +54,12 @@
         tools:context=".TripViewActivity" />
 
 
-
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:background="@drawable/shape_gradient_top_shadow"
+        app:layout_anchor="@id/itinerary" />
 
     <include layout="@layout/itinerary" />
 

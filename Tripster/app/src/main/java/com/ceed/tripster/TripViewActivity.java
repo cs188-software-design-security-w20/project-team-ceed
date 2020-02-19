@@ -452,29 +452,30 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onResult(final DirectionsResult result) {
                 new Handler(Looper.getMainLooper()).post(() -> {
+                    if(result.routes.length > 0) {
 
-                    DirectionsRoute route = result.routes[0];
-                    List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+                        DirectionsRoute route = result.routes[0];
+                        List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
 
-                    List<LatLng> newDecodedPath = new ArrayList<>();
+                        List<LatLng> newDecodedPath = new ArrayList<>();
 
-                    // This loops through all the LatLng coordinates of ONE polyline.
-                    for (com.google.maps.model.LatLng latLng : decodedPath) {
+                        // This loops through all the LatLng coordinates of ONE polyline.
+                        for (com.google.maps.model.LatLng latLng : decodedPath) {
 
-                        newDecodedPath.add(new LatLng(
-                                latLng.lat,
-                                latLng.lng
-                        ));
+                            newDecodedPath.add(new LatLng(
+                                    latLng.lat,
+                                    latLng.lng
+                            ));
+                        }
+                        if (_routePolyline != null) {
+                            _routePolyline.remove();
+                        }
+                        _routePolyline = _map.addPolyline(
+                                new PolylineOptions().addAll(newDecodedPath).color(Color.argb(200, 82, 136, 242)));
+                        _routePolyline.setClickable(true);
+
                     }
-                    if (_routePolyline != null) {
-                        _routePolyline.remove();
-                    }
-                    _routePolyline = _map.addPolyline(
-                            new PolylineOptions().addAll(newDecodedPath).color(Color.argb(200,82, 136, 242)));
-                    _routePolyline.setClickable(true);
-
-
                 });
             }
 
