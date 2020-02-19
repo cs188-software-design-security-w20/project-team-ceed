@@ -30,7 +30,9 @@
             />
     </androidx.cardview.widget.CardView>
 
-    <include layout="@layout/fragment_add_person"></include>
+    <include layout="@layout/fragment_add_person"
+        android:layout_width="400dp"
+        android:layout_height="400dp"></include>
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

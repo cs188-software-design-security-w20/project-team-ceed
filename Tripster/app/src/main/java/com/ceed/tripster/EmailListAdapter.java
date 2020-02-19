@@ -68,7 +68,7 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d("EMAILLISTADAPTER", databaseError.toString());
             }
         });
     }
