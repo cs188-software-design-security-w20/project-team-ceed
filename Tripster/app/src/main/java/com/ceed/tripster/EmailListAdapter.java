@@ -57,8 +57,9 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
                 if(dataSnapshot.exists()){
                     Log.d("EMAILLISTADAPTER", "User datasnapshot exists");
                     String memberId = _memberIds.get(position);
+                    Log.d("EMAILLISTADAPTER", "Member Email1: " + dataSnapshot.child(memberId).child("email").toString());
                     String memberEmail = dataSnapshot.child(memberId).child("email").getValue().toString();
-                    Log.d("EMAILLISTADAPTER", "Member Email: " + memberEmail);
+                    Log.d("EMAILLISTADAPTER", "Member Email2: " + memberEmail);
                     holder._textViewUserEmail.setText(memberEmail);
 
                 } else {
