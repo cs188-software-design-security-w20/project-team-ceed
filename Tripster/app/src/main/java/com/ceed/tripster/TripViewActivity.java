@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -66,6 +68,7 @@ public class TripViewActivity extends FragmentActivity
     private DatabaseReference _userTripDatabaseReference;
     private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
+    private boolean _tripActive = false;
 
     private Stop _startStop;
     private Stop _endStop;
@@ -137,7 +140,7 @@ public class TripViewActivity extends FragmentActivity
                         .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
                         .build();
 
-        _adapter = new ItineraryAdapter(options, _tripId, _tripStopsDatabaseReference, this);
+        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, this);
 
         _itineraryStops.setAdapter(_adapter);
         _adapter.startListening();
@@ -255,11 +258,16 @@ public class TripViewActivity extends FragmentActivity
         final FloatingActionButton acceptfab = findViewById(R.id.acceptfab);
         final FloatingActionButton rejectfab = findViewById(R.id.rejectfab);
 
-
         readUserTripsFromFirebase(new FirebaseCallback<HashMap<String, HashMap<String, String>>>() {
             @Override
             public void onCallback(final HashMap<String, HashMap<String, String>> dataItem) {
                 if (dataItem != null && dataItem.get(_tripId) != null) {
+                    acceptfab.setVisibility(View.VISIBLE);
+                    rejectfab.setVisibility(View.VISIBLE);
+                    searchCard.setVisibility(View.GONE);
+                    addfab.setVisibility(View.GONE);
+                    _tripActive = false;
+
                     String tripState = dataItem.get(_tripId).get("state");
                     if(TextUtils.equals(tripState, "inactive")){
                         _textViewTripStatus.setText("Ended");
@@ -274,6 +282,7 @@ public class TripViewActivity extends FragmentActivity
                             public void onClick(View view) {
                                 _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
                                 _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
+                                _tripActive = true;
                             }
                         });
                         rejectfab.setOnClickListener(new View.OnClickListener() {
@@ -302,6 +311,11 @@ public class TripViewActivity extends FragmentActivity
                     } else {
                         acceptfab.setVisibility(View.GONE);
                         rejectfab.setVisibility(View.GONE);
+                        searchCard.setVisibility(View.VISIBLE);
+                        _tripActive = true;
+                        addfab.setVisibility(View.VISIBLE);
+
+
                     }
                 }
 
@@ -503,28 +517,30 @@ public class TripViewActivity extends FragmentActivity
 
     @Override
     public void onStopDeleted(String placeId) {
-        HashMap<String, Stop> stops = _trip.getStops();
+        if(_tripActive) {
+            HashMap<String, Stop> stops = _trip.getStops();
 
-        for(String key: stops.keySet()) {
-            int index = stops.get(key).getIndex();
-            if (index > stops.get(placeId).getIndex()){
-                stops.get(key).setIndex(index - 1);
+            for (String key : stops.keySet()) {
+                int index = stops.get(key).getIndex();
+                if (index > stops.get(placeId).getIndex()) {
+                    stops.get(key).setIndex(index - 1);
+                }
             }
+
+
+            stops.remove(placeId);
+
+            _trip.setStops(stops);
+
+            _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
+
+            _markers.get(placeId).remove();
+            _markers.remove(placeId);
+
+
+            _wayPoints.remove(placeId);
+            createRoute();
         }
-
-
-        stops.remove(placeId);
-
-        _trip.setStops(stops);
-
-        _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
-
-        _markers.get(placeId).remove();
-        _markers.remove(placeId);
-
-
-        _wayPoints.remove(placeId);
-        createRoute();
     }
 
     @Override
@@ -573,6 +589,7 @@ public class TripViewActivity extends FragmentActivity
                     _onOnItemClickedCallBack.onItemClicked(_placeId);
                 }
         }
+
 
     }
 
