@@ -236,7 +236,7 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getSupportFragmentManager();
-                addPersonFragment p_fragment = new addPersonFragment();
+                addPersonFragment p_fragment = new addPersonFragment(_tripId);
                 p_fragment.show(manager, "addPersonFragment");
             }
         });
