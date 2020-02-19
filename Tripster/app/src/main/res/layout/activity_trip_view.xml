@@ -61,11 +61,10 @@
         android:background="@drawable/shape_gradient_top_shadow"
         app:layout_anchor="@id/itinerary" />
 
+
     <include layout="@layout/itinerary" />
 
-
-
-
+    
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/acceptfab"
