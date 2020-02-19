@@ -17,7 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
     private DatabaseReference _tripStopsDatabaseReference;
-    private String _tripId;
+
 
     public interface OnItemClickedCallBack {
         void onStopDeleted(String placeId);
@@ -29,15 +29,16 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
 
 
 
-    public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options, String tripId,
+    public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options,
                             DatabaseReference tripStopsDatabaseReference,
                             OnItemClickedCallBack onItemClickedCallBack){
         super(options);
 
         this._tripStopsDatabaseReference = tripStopsDatabaseReference;
-        _tripId = tripId;
         _onItemClickedCallBack = onItemClickedCallBack;
     }
+
+
 
     @Override
     protected void onBindViewHolder(@NonNull final TripViewActivity.StopsViewHolder holder, int position, @NonNull Stop model) {
@@ -85,73 +86,8 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
 
         TripViewActivity.StopsViewHolder holder =
                 new TripViewActivity.StopsViewHolder(view, _onItemClickedCallBack);
-
         return holder;
     }
 
-    /*
-    private List<String> _data;
-    private LayoutInflater _inflater;
-    private ItemClickListener _clickListener;
 
-    // data is passed into the constructor
-    ItineraryAdapter(Context context, List<String> data) {
-        this._inflater = LayoutInflater.from(context);
-        this._data = data;
-    }
-
-    // inflates the row layout from xml when needed
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = _inflater.inflate(R.layout.itinerary_item, parent, false);
-        return new ViewHolder(view);
-    }
-
-    // binds the data to the TextView in each row
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        String text = _data.get(position);
-        holder.myTextView.setText(text);
-    }
-
-    // total number of rows
-    @Override
-    public int getItemCount() {
-        return _data.size();
-    }
-
-
-    // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView myTextView;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            myTextView = itemView.findViewById(R.id.layoutItineraryItem);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (_clickListener != null) {
-                _clickListener.onItemClick(view, getAdapterPosition());
-            }
-        }
-    }
-
-    // convenience method for getting data at click position
-    String getItem(int id) {
-        return _data.get(id);
-    }
-
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this._clickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
-    }
-    */
 }
