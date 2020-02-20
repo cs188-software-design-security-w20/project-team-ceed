@@ -207,7 +207,16 @@ public class TripViewActivity extends FragmentActivity
 
         _placesClient = Places.createClient(this);
 
+        // New Adapter
+        FirebaseRecyclerOptions<Stop> options =
+                new FirebaseRecyclerOptions.Builder<Stop>()
+                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
+                        .build();
 
+        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, _placesClient, TripViewActivity.this);
+
+        _itineraryStops.setAdapter(_adapter);
+        _adapter.startListening();
 
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
@@ -554,19 +563,9 @@ public class TripViewActivity extends FragmentActivity
                         }
 
 
-                        // We make the adapter here cus
-                        if(_adapter == null) {
-                            // New Adapter
-                            FirebaseRecyclerOptions<Stop> options =
-                                    new FirebaseRecyclerOptions.Builder<Stop>()
-                                            .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
-                                            .build();
+                        // Notify here cus we destinations to be available.
+                       _adapter.notifyDataSetChanged();
 
-                            _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, _placesClient, TripViewActivity.this);
-
-                            _itineraryStops.setAdapter(_adapter);
-                            _adapter.startListening();
-                        }
 
 
                         List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
