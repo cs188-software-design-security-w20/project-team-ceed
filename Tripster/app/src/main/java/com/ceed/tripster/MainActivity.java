@@ -55,7 +55,9 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         androidx.appcompat.widget.Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_app_bar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.quantum_white_text));
         setSupportActionBar(toolbar);
+
 
     }
 

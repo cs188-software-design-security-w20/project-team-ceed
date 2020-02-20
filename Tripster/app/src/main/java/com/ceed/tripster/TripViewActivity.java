@@ -231,7 +231,7 @@ public class TripViewActivity extends FragmentActivity
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                if (_stopInfos.size() <= 25) {
+                if (_stopInfos.size() <= 25 && !_stopInfos.containsKey(place.getId())) {
                     // Waypoints.size() + 1 to get to end of list.
                     Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
                             place.getLatLng().latitude, place.getLatLng().longitude, _stopInfos.size() - 1);
@@ -253,8 +253,13 @@ public class TripViewActivity extends FragmentActivity
                     // The marker will get created in setStops() which is called in readTripFromFirebase
                     _map.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 4f));
                 } else {
-                    Toast.makeText(TripViewActivity.this,
-                            "Could not add stop; already at max waypoints.", Toast.LENGTH_SHORT).show();
+                    if(_stopInfos.size() > 25) {
+                        Toast.makeText(TripViewActivity.this,
+                                "Could not add stop; already at max waypoints.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(TripViewActivity.this,
+                                "Could not add stop; stop already added.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
@@ -331,6 +336,7 @@ public class TripViewActivity extends FragmentActivity
                                 _userTripDatabaseReference.child(_tripId).child("state").setValue("active");
                                 _tripDatabaseReference.child("memberIds").child(_userId).setValue("active");
                                 _tripActive = true;
+                                _adapter.notifyDataSetChanged();
                             }
                         });
                         rejectfab.setOnClickListener(new View.OnClickListener() {
@@ -362,6 +368,7 @@ public class TripViewActivity extends FragmentActivity
                         searchCard.setVisibility(View.VISIBLE);
                         _tripActive = true;
                         addfab.setVisibility(View.VISIBLE);
+                        _adapter.notifyDataSetChanged();
 
 
                     }
