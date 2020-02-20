@@ -7,8 +7,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
-import android.content.Context;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,8 +17,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
@@ -35,6 +35,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -58,8 +60,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 public class TripViewActivity extends FragmentActivity
-        implements OnMapReadyCallback, ItineraryAdapter.OnItemClickedCallBack {
+        implements OnMapReadyCallback, ItineraryAdapter.CommunicationCallbacks {
 
     private GoogleMap _map;
     private BottomSheetBehavior _bottomSheetBehavior;
@@ -69,14 +73,15 @@ public class TripViewActivity extends FragmentActivity
     private DatabaseReference _tripStopsDatabaseReference;
     private String _tripId;
     private boolean _tripActive = false;
+    private PlacesClient _placesClient;
 
     private Stop _startStop;
     private Stop _endStop;
     private String _endStopPlaceId;
-    private HashMap<String, com.google.maps.model.LatLng> _wayPoints = new HashMap<>();
     private GeoApiContext _geoApiContext;
     private Polyline _routePolyline;
-    private HashMap<String, Marker> _markers = new HashMap<>();
+    private HashMap<String, StopInfo> _stopInfos = new HashMap<>();
+
 
     private TextView _textViewTripName;
     private TextView _textViewStartLocation;
@@ -89,6 +94,30 @@ public class TripViewActivity extends FragmentActivity
     String _userId;
 
     private Trip _trip;
+
+    private class StopInfo {
+        public Marker _marker;
+        public com.google.maps.model.LatLng _wayPoint;
+        public Double _rating;
+        public String _type;
+
+        public StopInfo() {
+
+        }
+
+        public StopInfo(Marker marker, Double rating, String type) {
+            this._marker = marker;
+            this._rating = rating;
+            _type = type;
+        }
+
+        public StopInfo(Marker _marker, com.google.maps.model.LatLng wayPoint, Double rating, String type) {
+            this._marker = _marker;
+            this._wayPoint = wayPoint;
+            this._rating = rating;
+            this._type = type;
+        }
+    }
 
 
     @Override
@@ -134,17 +163,6 @@ public class TripViewActivity extends FragmentActivity
         _tripId = TripViewActivityArgs.fromBundle(getIntent().getExtras()).getTripID();
 
 
-        // New Adapter
-        FirebaseRecyclerOptions<Stop> options =
-                new FirebaseRecyclerOptions.Builder<Stop>()
-                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
-                        .build();
-
-        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, this);
-
-        _itineraryStops.setAdapter(_adapter);
-        _adapter.startListening();
-
         _bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.itinerary));
 
 
@@ -161,7 +179,7 @@ public class TripViewActivity extends FragmentActivity
 
 
                 _map.clear();
-                _wayPoints = setStops(dataItem.getStops());
+                setStops(dataItem.getStops());
                 createRoute();
 
 
@@ -177,6 +195,19 @@ public class TripViewActivity extends FragmentActivity
             Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
         }
 
+        _placesClient = Places.createClient(this);
+
+        // New Adapter
+        FirebaseRecyclerOptions<Stop> options =
+                new FirebaseRecyclerOptions.Builder<Stop>()
+                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
+                        .build();
+
+        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, _placesClient, this);
+
+        _itineraryStops.setAdapter(_adapter);
+        _adapter.startListening();
+
 
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
@@ -185,29 +216,37 @@ public class TripViewActivity extends FragmentActivity
 
         // Specify the types of place data to return.
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
-                Place.Field.LAT_LNG, Place.Field.ADDRESS));
+                Place.Field.LAT_LNG, Place.Field.ADDRESS, Place.Field.RATING));
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
+                if (_stopInfos.size() <= 25) {
+                    // Waypoints.size() + 1 to get to end of list.
+                    Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
+                            place.getLatLng().latitude, place.getLatLng().longitude, _stopInfos.size() - 1);
 
-                // Waypoints.size() + 2 to get to end of list
-                Stop stop = new Stop(place.getName(), "stop", place.getAddress(),
-                        place.getLatLng().latitude, place.getLatLng().longitude, _wayPoints.size() + 1);
+                    _endStop.setIndex(_endStop.getIndex() + 1);
+                    _trip.getStops().put(_endStopPlaceId, _endStop);
+                    writeStopToDatabase(place.getId(), stop);
 
-                _endStop.setIndex(_endStop.getIndex() + 1);
-                _trip.getStops().put(_endStopPlaceId, _endStop);
-                writeStopToDatabase(place.getId(), stop);
+                    StopInfo info = new StopInfo();
+                    info._wayPoint = new com.google.maps.model.LatLng(place.getLatLng().latitude,
+                            place.getLatLng().longitude);
+                    info._type = "stop";
+                    _stopInfos.put(place.getId(), info);
 
-                _wayPoints.put(place.getId(), new com.google.maps.model.LatLng(place.getLatLng().latitude,
-                        place.getLatLng().longitude));
-                createRoute();
+                    // This call isn't entirely necessary since createRoute will automatically get called
+                    // when a database change is detected but ill do it just in case
+                    createRoute();
 
-                _map.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),4f));
-
-                // The marker will get created in setStops() which is called in readTripFromFirebase
-
+                    // The marker will get created in setStops() which is called in readTripFromFirebase
+                    _map.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 4f));
+                } else {
+                    Toast.makeText(TripViewActivity.this,
+                            "Could not add stop; already at max waypoints.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -227,10 +266,10 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
-       if (_geoApiContext == null) {
-           _geoApiContext =
-                   new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
-       }
+        if (_geoApiContext == null) {
+            _geoApiContext =
+                    new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
+        }
 
         _databaseRoot = FirebaseDatabase.getInstance().getReference();
 
@@ -269,13 +308,13 @@ public class TripViewActivity extends FragmentActivity
                     _tripActive = false;
 
                     String tripState = dataItem.get(_tripId).get("state");
-                    if(TextUtils.equals(tripState, "inactive")){
+                    if (TextUtils.equals(tripState, "inactive")) {
                         _textViewTripStatus.setText("Ended");
-                    } else if(TextUtils.equals(tripState, "active")){
+                    } else if (TextUtils.equals(tripState, "active")) {
                         _textViewTripStatus.setText("In Progress");
                     }
 
-                    if(TextUtils.equals(tripState, "pending")) {
+                    if (TextUtils.equals(tripState, "pending")) {
                         _textViewTripStatus.setText("Pending");
                         acceptfab.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -385,8 +424,7 @@ public class TripViewActivity extends FragmentActivity
     }
 
 
-    private HashMap<String, com.google.maps.model.LatLng> setStops(HashMap<String, Stop> stops) {
-
+    private void setStops(HashMap<String, Stop> stops) {
         HashMap<String, com.google.maps.model.LatLng> wayPoints = new HashMap<>();
 
         for (Map.Entry mapElement : stops.entrySet()) {
@@ -396,34 +434,70 @@ public class TripViewActivity extends FragmentActivity
                 _startStop = (Stop) mapElement.getValue();
 
                 LatLng start = new LatLng(_startStop.getLatitude(), _startStop.getLongitude());
-                _markers.put(key, _map.addMarker(new MarkerOptions().position(start).title(_startStop.getName())
+                Marker marker = _map.addMarker(new MarkerOptions().position(start).title(_startStop.getName())
                         .icon(BitmapDescriptorFactory
-                                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Start")));
+                                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).snippet("Start"));
+
+                if (_stopInfos.get(key) == null) {
+                    StopInfo info = new StopInfo();
+                    info._type = "start";
+                    info._wayPoint = new com.google.maps.model.LatLng(start.latitude, start.longitude);
+                    _stopInfos.put(key, info);
+
+                }
+
+                _stopInfos.get(key)._marker = marker;
+
+
                 // Only zoom in on start marker if trip view was just opened.
-                if(_wayPoints.size() == 0){
+                if (_stopInfos.size() <= 2) {
                     _map.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 3.5f));
                 }
             } else if (((Stop) mapElement.getValue()).getType().equals("end")) {
                 _endStop = (Stop) mapElement.getValue();
                 _endStopPlaceId = (String) mapElement.getKey();
                 LatLng end = new LatLng(_endStop.getLatitude(), _endStop.getLongitude());
-                _markers.put(key, _map.addMarker(new MarkerOptions().position(end).title(_endStop.getName())
-                        .snippet("Destination")));
+
+                Marker marker = _map.addMarker(new MarkerOptions().position(end).title(_endStop.getName())
+                        .snippet("Destination"));
+
+                if (_stopInfos.get(key) == null) {
+                    StopInfo info = new StopInfo();
+                    info._type = "end";
+                    info._wayPoint = new com.google.maps.model.LatLng(end.latitude, end.longitude);
+                    _stopInfos.put(key, info);
+                }
+
+                _stopInfos.get(key)._marker = marker;
             } else {
                 Stop stop = ((Stop) mapElement.getValue());
                 LatLng stopLatLng = new LatLng(stop.getLatitude(),
                         stop.getLongitude());
-                wayPoints.put((String)mapElement.getKey(), new com.google.maps.model.LatLng(stopLatLng.latitude, stopLatLng.longitude));
+                wayPoints.put((String) mapElement.getKey(), new com.google.maps.model.LatLng(stopLatLng.latitude, stopLatLng.longitude));
 
-                _markers.put(key, _map.addMarker(new MarkerOptions().position(stopLatLng).title(stop.getName())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))));
+
+                Marker marker = _map.addMarker(new MarkerOptions().position(stopLatLng).title(stop.getName())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+
+                if (_stopInfos.get(key) == null) {
+                    StopInfo info = new StopInfo();
+                    info._type = "stop";
+                    info._wayPoint = new com.google.maps.model.LatLng(stopLatLng.latitude, stopLatLng.longitude);
+                    _stopInfos.put(key, info);
+                }
+
+                _stopInfos.get(key)._marker = marker;
+
+
+
 
             }
 
 
+
+
         }
 
-        return wayPoints;
     }
 
     private void createRoute() {
@@ -444,15 +518,23 @@ public class TripViewActivity extends FragmentActivity
         );
 
 
-        if (_wayPoints.size() != 0) {
-            directions.waypoints(_wayPoints.values().toArray(new com.google.maps.model.LatLng[0]));
+        if (_stopInfos.size() > 2) {
+            ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
+            for (String key : _stopInfos.keySet()) {
+                StopInfo info = _stopInfos.get(key);
+                Log.v("info", info._type + ", " + info._wayPoint);
+                if (info._type.equals("stop")) {
+                    wayPoints.add(info._wayPoint);
+                }
+            }
+            directions.waypoints(wayPoints.toArray(new com.google.maps.model.LatLng[0]));
         }
 
         directions.destination(destination).setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
             public void onResult(final DirectionsResult result) {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    if(result.routes.length > 0) {
+                    if (result.routes.length > 0) {
 
                         DirectionsRoute route = result.routes[0];
                         List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
@@ -508,7 +590,7 @@ public class TripViewActivity extends FragmentActivity
     }
 
     private void writeStopToDatabase(String placeId, Stop stop) {
-        HashMap<String, Stop> stops= _trip.getStops();
+        HashMap<String, Stop> stops = _trip.getStops();
         stops.put(placeId, stop);
 
         _trip.setStops(stops);
@@ -518,7 +600,7 @@ public class TripViewActivity extends FragmentActivity
 
     @Override
     public void onStopDeleted(String placeId) {
-        if(_tripActive) {
+        if (_tripActive) {
             HashMap<String, Stop> stops = _trip.getStops();
 
             for (String key : stops.keySet()) {
@@ -535,23 +617,40 @@ public class TripViewActivity extends FragmentActivity
 
             _databaseRoot.child("Trips").child(_tripId).setValue(_trip);
 
-            _markers.get(placeId).remove();
-            _markers.remove(placeId);
+            _stopInfos.get(placeId)._marker.remove();
+            _stopInfos.remove(placeId);
 
-
-            _wayPoints.remove(placeId);
             createRoute();
         }
     }
 
     @Override
     public void onItemClicked(String placeId) {
-        Marker marker = _markers.get(placeId);
+        Marker marker = _stopInfos.get(placeId)._marker;
         marker.showInfoWindow();
         _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-        _map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(),5));
+        _map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 5));
 
+    }
+
+
+    @Override
+    public boolean isTripActive() {
+        return _tripActive;
+    }
+
+    @Override
+    public void setRating(String placeId, Double rating) {
+        _stopInfos.get(placeId)._rating = rating;
+        String type = _stopInfos.get(placeId)._type;
+        if (type.equals("stop") ) {
+            _stopInfos.get(placeId)._marker.setSnippet("Rating: " + rating);
+        } else {
+            _stopInfos.get(placeId)._marker.setSnippet(
+                    format("%s Rating: " + rating+ "/5",
+                            type.equals("start") ? "Start," : "Destination,"));
+        }
     }
 
 
@@ -560,36 +659,36 @@ public class TripViewActivity extends FragmentActivity
         TextView _textViewStopName;
         TextView _textViewStopAddress;
         TextView _textViewStopType;
+        TextView _textViewRating;
         ImageButton _imageButton;
-        LinearLayout _listItem;
+        RelativeLayout _listItem;
         String _placeId;
-        ItineraryAdapter.OnItemClickedCallBack _onOnItemClickedCallBack;
-
+        ItineraryAdapter.CommunicationCallbacks _communicationCallbacks;
 
 
         public StopsViewHolder(@NonNull View itemView,
-                               ItineraryAdapter.OnItemClickedCallBack onItemClickedCallBack) {
+                               ItineraryAdapter.CommunicationCallbacks communicationCallbacks) {
             super(itemView);
             _textViewStopName = itemView.findViewById(R.id.textViewStopName);
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
+            _textViewRating = itemView.findViewById(R.id.textViewRating);
             _imageButton = itemView.findViewById(R.id.delete_stop_button);
             _imageButton.setOnClickListener(this);
-            _listItem = itemView.findViewById(R.id.horizontal_layout);
+            _listItem = itemView.findViewById(R.id.layoutItineraryItem);
             _listItem.setOnClickListener(this);
-            _onOnItemClickedCallBack = onItemClickedCallBack;
+            _communicationCallbacks = communicationCallbacks;
         }
 
         @Override
         public void onClick(View view) {
-            Log.v("click", "click");
-
-                if(view.getId() ==  R.id.delete_stop_button) {
-                    _onOnItemClickedCallBack.onStopDeleted(_placeId);
-                } else {
-                    _onOnItemClickedCallBack.onItemClicked(_placeId);
-                }
+            if (view.getId() == R.id.delete_stop_button) {
+                _communicationCallbacks.onStopDeleted(_placeId);
+            } else {
+                _communicationCallbacks.onItemClicked(_placeId);
+            }
         }
+
 
 
     }

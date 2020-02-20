@@ -45,6 +45,16 @@
                 android:text="Address"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
+                android:maxWidth="305dp"
+                />
+
+            <TextView
+                android:id="@+id/textViewRating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
                 />
 
             <TextView

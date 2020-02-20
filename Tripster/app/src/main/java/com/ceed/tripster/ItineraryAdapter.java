@@ -10,32 +10,44 @@ import androidx.annotation.NonNull;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static java.lang.String.format;
+
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
     private DatabaseReference _tripStopsDatabaseReference;
+    private PlacesClient _placesClient;
 
-
-    public interface OnItemClickedCallBack {
+    public interface CommunicationCallbacks {
         void onStopDeleted(String placeId);
         void onItemClicked(String placeId);
+        boolean isTripActive();
+        void setRating(String placeId, Double rating);
     }
 
-    private OnItemClickedCallBack _onItemClickedCallBack;
+    private CommunicationCallbacks _communicationCallbacks;
 
 
 
 
     public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options,
-                            DatabaseReference tripStopsDatabaseReference,
-                            OnItemClickedCallBack onItemClickedCallBack){
+                            DatabaseReference tripStopsDatabaseReference, PlacesClient placesClient,
+                            CommunicationCallbacks communicationCallbacks){
         super(options);
 
         this._tripStopsDatabaseReference = tripStopsDatabaseReference;
-        _onItemClickedCallBack = onItemClickedCallBack;
+        _communicationCallbacks = communicationCallbacks;
+        _placesClient = placesClient;
     }
 
 
@@ -55,6 +67,36 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                     holder._textViewStopName.setText(stopName);
                     holder._textViewStopAddress.setText(stopAddress);
                     holder._placeId = listStopId;
+
+                    Log.v("ac", _communicationCallbacks.isTripActive() + "");
+                    if(!_communicationCallbacks.isTripActive()) {
+                        holder._imageButton.setVisibility(View.GONE);
+                    }
+
+                    List<Place.Field> placeFields = Arrays.asList(Place.Field.RATING);
+
+                    // Construct a request object, passing the place ID and fields array.
+                    FetchPlaceRequest request = FetchPlaceRequest.newInstance(listStopId, placeFields);
+
+                    _placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                        Place place = response.getPlace();
+                        Log.v("rating", place.getRating() + "");
+                        if (place.getRating() != null) {
+                            _communicationCallbacks.setRating(listStopId, place.getRating());
+                            holder._textViewRating.setText("Rating: " + place.getRating());
+                        } else {
+                            holder._textViewRating.setVisibility(View.GONE);
+                        }
+
+                    }).addOnFailureListener((exception) -> {
+                        if (exception instanceof ApiException) {
+                            ApiException apiException = (ApiException) exception;
+                            int statusCode = apiException.getStatusCode();
+                            // Handle error with given status code.
+                            Log.e("ERROR", "Place not found: " + exception.getMessage());
+                        }
+                    });
+
 
                     if (TextUtils.equals(type, "start")) {
                         holder._textViewStopType.setText("Start Stop");
@@ -85,7 +127,7 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.itinerary_item, parent, false);
 
         TripViewActivity.StopsViewHolder holder =
-                new TripViewActivity.StopsViewHolder(view, _onItemClickedCallBack);
+                new TripViewActivity.StopsViewHolder(view, _communicationCallbacks);
         return holder;
     }
 
