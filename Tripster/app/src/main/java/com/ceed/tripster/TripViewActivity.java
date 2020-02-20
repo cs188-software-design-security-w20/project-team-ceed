@@ -1,6 +1,7 @@
 package com.ceed.tripster;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -51,14 +52,21 @@ import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
 import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 import static java.lang.String.format;
 
@@ -100,6 +108,7 @@ public class TripViewActivity extends FragmentActivity
         public com.google.maps.model.LatLng _wayPoint;
         public Double _rating;
         public String _type;
+        public String _duration;
 
         public StopInfo() {
 
@@ -111,11 +120,12 @@ public class TripViewActivity extends FragmentActivity
             _type = type;
         }
 
-        public StopInfo(Marker _marker, com.google.maps.model.LatLng wayPoint, Double rating, String type) {
+        public StopInfo(Marker _marker, com.google.maps.model.LatLng wayPoint, Double rating, String type, String duration) {
             this._marker = _marker;
             this._wayPoint = wayPoint;
             this._rating = rating;
             this._type = type;
+            this._duration = duration;
         }
     }
 
@@ -197,16 +207,6 @@ public class TripViewActivity extends FragmentActivity
 
         _placesClient = Places.createClient(this);
 
-        // New Adapter
-        FirebaseRecyclerOptions<Stop> options =
-                new FirebaseRecyclerOptions.Builder<Stop>()
-                        .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
-                        .build();
-
-        _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, _placesClient, this);
-
-        _itineraryStops.setAdapter(_adapter);
-        _adapter.startListening();
 
 
         // Initialize the AutocompleteSupportFragment.
@@ -537,6 +537,38 @@ public class TripViewActivity extends FragmentActivity
                     if (result.routes.length > 0) {
 
                         DirectionsRoute route = result.routes[0];
+
+                        TreeMap<Integer, String> indexToPlaceId = new TreeMap<>();
+                        for (String key : _trip.getStops().keySet()){
+                            Stop stop = _trip.getStops().get(key);
+                            if(!stop.getType().equals("start")){
+                                indexToPlaceId.put(stop.getIndex(), key);
+                            }
+
+                        }
+
+                        for (Map.Entry mapElement : indexToPlaceId.entrySet()) {
+                            String placeId = (String) mapElement.getValue();
+                            int index = (int) mapElement.getKey();
+                            _stopInfos.get(placeId)._duration = route.legs[index - 1].duration.humanReadable;
+                        }
+
+
+                        // We make the adapter here cus
+                        if(_adapter == null) {
+                            // New Adapter
+                            FirebaseRecyclerOptions<Stop> options =
+                                    new FirebaseRecyclerOptions.Builder<Stop>()
+                                            .setQuery(_tripStopsDatabaseReference.orderByChild("index"), Stop.class)
+                                            .build();
+
+                            _adapter = new ItineraryAdapter(options, _tripStopsDatabaseReference, _placesClient, TripViewActivity.this);
+
+                            _itineraryStops.setAdapter(_adapter);
+                            _adapter.startListening();
+                        }
+
+
                         List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
 
 
@@ -653,6 +685,11 @@ public class TripViewActivity extends FragmentActivity
         }
     }
 
+    @Override
+    public String getDuration(String placeId) {
+        return "Duration: " + _stopInfos.get(placeId)._duration;
+    }
+
 
     static public class StopsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -660,6 +697,7 @@ public class TripViewActivity extends FragmentActivity
         TextView _textViewStopAddress;
         TextView _textViewStopType;
         TextView _textViewRating;
+        TextView _textViewDuration;
         ImageButton _imageButton;
         RelativeLayout _listItem;
         String _placeId;
@@ -673,6 +711,7 @@ public class TripViewActivity extends FragmentActivity
             _textViewStopAddress = itemView.findViewById(R.id.textViewStopAddress);
             _textViewStopType = itemView.findViewById(R.id.textViewStopType);
             _textViewRating = itemView.findViewById(R.id.textViewRating);
+            _textViewDuration = itemView.findViewById(R.id.textViewDuration);
             _imageButton = itemView.findViewById(R.id.delete_stop_button);
             _imageButton.setOnClickListener(this);
             _listItem = itemView.findViewById(R.id.layoutItineraryItem);

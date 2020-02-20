@@ -33,6 +33,7 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
         void onItemClicked(String placeId);
         boolean isTripActive();
         void setRating(String placeId, Double rating);
+        String getDuration(String placeId);
     }
 
     private CommunicationCallbacks _communicationCallbacks;
@@ -67,8 +68,12 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                     holder._textViewStopName.setText(stopName);
                     holder._textViewStopAddress.setText(stopAddress);
                     holder._placeId = listStopId;
+                    holder._textViewDuration.setText(_communicationCallbacks.getDuration(listStopId));
 
-                    Log.v("ac", _communicationCallbacks.isTripActive() + "");
+                    if(type.equals("start")) {
+                        holder._textViewDuration.setVisibility(View.GONE);
+                    }
+
                     if(!_communicationCallbacks.isTripActive()) {
                         holder._imageButton.setVisibility(View.GONE);
                     }
