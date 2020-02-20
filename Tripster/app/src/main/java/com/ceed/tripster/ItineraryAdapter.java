@@ -22,8 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.String.format;
-
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
     private DatabaseReference _tripStopsDatabaseReference;
     private PlacesClient _placesClient;

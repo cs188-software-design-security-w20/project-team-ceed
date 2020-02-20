@@ -1,7 +1,5 @@
 package com.ceed.tripster;
 
-import com.google.android.gms.maps.model.LatLng;
-
 public class Stop {
 
     private String name;
