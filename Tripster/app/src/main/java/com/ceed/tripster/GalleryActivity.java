@@ -62,7 +62,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         FirebaseRecyclerOptions<GalleryPhoto> options =
                 new FirebaseRecyclerOptions.Builder<GalleryPhoto>()
-                        .setQuery(_tripImagesDatabaseRef, GalleryPhoto.class)
+                        .setQuery(_tripImagesDatabaseRef.orderByChild("uploadTimestamp"), GalleryPhoto.class)
                         .build();
 
         _adapter = new GalleryAdapter(options);
@@ -115,8 +115,7 @@ public class GalleryActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                Long uploadTsLong = System.currentTimeMillis()/1000;
-                                String uploadTs = uploadTsLong.toString();
+                                Long uploadTs = System.currentTimeMillis()/1000;
 
                                 GalleryPhoto newPhoto = new GalleryPhoto(downloadUrl, userId, uploadTs);
                                 _tripImagesDatabaseRef.child(key).setValue(newPhoto);
