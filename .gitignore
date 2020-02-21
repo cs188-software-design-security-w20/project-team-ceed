@@ -1,6 +1,5 @@
 .DS_STORE
 Tripster/.gradle
-Tripster/gradle.properties
 Tripster/local.properties
 Tripster/.idea/workspace.xml
 Tripster/.idea/libraries

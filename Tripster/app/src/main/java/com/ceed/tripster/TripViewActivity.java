@@ -177,7 +177,7 @@ public class TripViewActivity extends FragmentActivity
                 Log.d("Trip info", dataItem.getStart());
                 Log.d("Trip info", dataItem.getDestination());
                 Log.d("Trip info", dataItem.getStops().toString());
-                Log.d("Trip info", dataItem.getMemberIds().toString());
+                // Log.d("Trip info", dataItem.getMemberIds().toString());
 
 
                 _map.clear();

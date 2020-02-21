@@ -84,7 +84,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
         _tripDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if(dataSnapshot.exists() && dataSnapshot.child("memberIds").getValue() != null){
 
                     _memberIds = new ArrayList<String>(((HashMap<String, String>) dataSnapshot.child("memberIds").getValue()).keySet());
                     Log.d("ADDPERSONFRAGMENT", _memberIds.get(0));
