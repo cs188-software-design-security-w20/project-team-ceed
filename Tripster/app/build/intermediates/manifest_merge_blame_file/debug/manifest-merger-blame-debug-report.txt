@@ -1,0 +1,325 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.ceed.tripster"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="22"
+8-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml
+10    <!--
+11         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+12         Google Maps Android API v2, but you must specify either coarse or fine
+13         location permissions for the 'MyLocation' functionality.
+14    -->
+15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+15-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:9:5-79
+15-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:9:22-76
+16    <uses-permission android:name="android.permission.INTERNET" />
+16-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:10:5-67
+16-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:10:22-64
+17    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+17-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:11:5-80
+17-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:11:22-77
+18    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- Although the *SdkVersion is captured in gradle build files, this is required for non gradle builds -->
+18-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:10:5-76
+18-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:10:22-73
+19    <!-- <uses-sdk android:minSdkVersion="14"/> -->
+20    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+20-->[com.google.firebase:firebase-database:19.2.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/6831c399c1cdd8ab26a1b1eca7b76e39/firebase-database-19.2.1/AndroidManifest.xml:25:5-79
+20-->[com.google.firebase:firebase-database:19.2.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/6831c399c1cdd8ab26a1b1eca7b76e39/firebase-database-19.2.1/AndroidManifest.xml:25:22-76
+21
+22    <uses-feature
+22-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:26:5-28:35
+23        android:glEsVersion="0x00020000"
+23-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:27:9-41
+24        android:required="true" />
+24-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:28:9-32
+25
+26    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+26-->[com.google.android.gms:play-services-measurement-api:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/c673a6339f17cbb1c2ea7ee712cc9b8a/play-services-measurement-api-17.2.2/AndroidManifest.xml:24:5-68
+26-->[com.google.android.gms:play-services-measurement-api:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/c673a6339f17cbb1c2ea7ee712cc9b8a/play-services-measurement-api-17.2.2/AndroidManifest.xml:24:22-65
+27    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+27-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:26:5-82
+27-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:26:22-79
+28    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+28-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:26:5-110
+28-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:26:22-107
+29
+30    <application
+30-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:13:5-51:19
+31        android:allowBackup="true"
+31-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:14:9-35
+32        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+32-->[androidx.core:core:1.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/e460b93803df50ee02ababe8ad2a5abf/core-1.1.0/AndroidManifest.xml:24:18-86
+33        android:debuggable="true"
+34        android:icon="@mipmap/ic_launcher"
+34-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:15:9-43
+35        android:label="@string/app_name"
+35-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:16:9-41
+36        android:roundIcon="@mipmap/ic_launcher_round"
+36-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:17:9-54
+37        android:supportsRtl="true"
+37-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:18:9-35
+38        android:testOnly="true"
+39        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+39-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:19:9-65
+40        <activity
+40-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:21:9-27:20
+41            android:name="com.ceed.tripster.GalleryActivity"
+41-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:22:13-44
+42            android:parentActivityName="com.ceed.tripster.TripViewActivity" >
+42-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:23:13-59
+43            <meta-data
+43-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:24:13-26:70
+44                android:name="android.support.PARENT_ACTIVITY"
+44-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:25:17-63
+45                android:value="com.ceed.tripster.TripViewActivity" />
+45-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:26:17-67
+46        </activity>
+47        <!--
+48             The API key for Google Maps-based APIs is defined as a string resource.
+49             (See the file "res/values/google_maps_api.xml").
+50             Note that the API key is linked to the encryption key used to sign the APK.
+51             You need a different API key for each encryption key, including the release key that is used to
+52             sign the APK for publishing.
+53             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+54        -->
+55        <meta-data
+55-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:36:9-38:55
+56            android:name="com.google.android.geo.API_KEY"
+56-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:37:13-58
+57            android:value="@string/google_maps_key" />
+57-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:38:13-52
+58
+59        <activity
+59-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:40:9-42:64
+60            android:name="com.ceed.tripster.TripViewActivity"
+60-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:41:13-45
+61            android:label="@string/title_activity_trip_view" />
+61-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:42:13-61
+62        <activity android:name="com.ceed.tripster.MainActivity" />
+62-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:43:9-50
+62-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:43:19-47
+63        <activity android:name="com.ceed.tripster.StartActivity" >
+63-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:44:9-50:20
+63-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:44:19-48
+64            <intent-filter>
+64-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:45:13-49:29
+65                <action android:name="android.intent.action.MAIN" />
+65-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:46:17-69
+65-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:46:25-66
+66
+67                <category android:name="android.intent.category.LAUNCHER" />
+67-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:48:17-77
+67-->/Users/jair/repos/project-team-ceed/Tripster/app/src/main/AndroidManifest.xml:48:27-74
+68            </intent-filter>
+69        </activity>
+70        <activity
+70-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:14:9-20:20
+71            android:name="com.google.android.libraries.places.widget.AutocompleteActivity"
+71-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:15:13-91
+72            android:exported="false"
+72-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:16:13-37
+73            android:label="@string/places_autocomplete_label"
+73-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:17:13-62
+74            android:theme="@style/PlacesAutocompleteOverlay"
+74-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:18:13-61
+75            android:windowSoftInputMode="adjustResize" >
+75-->[com.google.android.libraries.places:places:2.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/b32c6bee50f1e0fe5e091cce517d095e/places-2.2.0/AndroidManifest.xml:19:13-55
+76        </activity>
+77        <activity
+77-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:24:9-31:50
+78            android:name="com.google.firebase.auth.internal.FederatedSignInActivity"
+78-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:25:13-85
+79            android:excludeFromRecents="true"
+79-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:26:13-46
+80            android:exported="true"
+80-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:27:13-36
+81            android:launchMode="singleTask"
+81-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:28:13-44
+82            android:permission="com.google.firebase.auth.api.gms.permission.LAUNCH_FEDERATED_SIGN_IN"
+82-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:29:13-102
+83            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+83-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:30:13-72
+84
+85        <service
+85-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:33:9-39:19
+86            android:name="com.google.firebase.components.ComponentDiscoveryService"
+86-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:34:13-84
+87            android:directBootAware="true"
+87-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:34:13-43
+88            android:exported="false" >
+88-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:35:13-37
+89            <meta-data
+89-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:36:13-38:85
+90                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+90-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:37:17-109
+91                android:value="com.google.firebase.components.ComponentRegistrar" />
+91-->[com.google.firebase:firebase-auth:19.2.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/7fd2b317304302d7384c0de0a1950e6f/firebase-auth-19.2.0/AndroidManifest.xml:38:17-82
+92            <meta-data
+92-->[com.google.firebase:firebase-database:19.2.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/6831c399c1cdd8ab26a1b1eca7b76e39/firebase-database-19.2.1/AndroidManifest.xml:32:13-34:85
+93                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+93-->[com.google.firebase:firebase-database:19.2.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/6831c399c1cdd8ab26a1b1eca7b76e39/firebase-database-19.2.1/AndroidManifest.xml:33:17-109
+94                android:value="com.google.firebase.components.ComponentRegistrar" />
+94-->[com.google.firebase:firebase-database:19.2.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/6831c399c1cdd8ab26a1b1eca7b76e39/firebase-database-19.2.1/AndroidManifest.xml:34:17-82
+95            <meta-data
+95-->[com.google.firebase:firebase-storage:19.1.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/802e967b3a5cf82d8bdc73cfb95e3fcc/firebase-storage-19.1.1/AndroidManifest.xml:33:13-35:85
+96                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+96-->[com.google.firebase:firebase-storage:19.1.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/802e967b3a5cf82d8bdc73cfb95e3fcc/firebase-storage-19.1.1/AndroidManifest.xml:34:17-107
+97                android:value="com.google.firebase.components.ComponentRegistrar" />
+97-->[com.google.firebase:firebase-storage:19.1.1] /Users/jair/.gradle/caches/transforms-2/files-2.1/802e967b3a5cf82d8bdc73cfb95e3fcc/firebase-storage-19.1.1/AndroidManifest.xml:35:17-82
+98            <meta-data
+98-->[com.google.android.gms:play-services-measurement-api:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/c673a6339f17cbb1c2ea7ee712cc9b8a/play-services-measurement-api-17.2.2/AndroidManifest.xml:30:13-32:85
+99                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+99-->[com.google.android.gms:play-services-measurement-api:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/c673a6339f17cbb1c2ea7ee712cc9b8a/play-services-measurement-api-17.2.2/AndroidManifest.xml:31:17-139
+100                android:value="com.google.firebase.components.ComponentRegistrar" />
+100-->[com.google.android.gms:play-services-measurement-api:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/c673a6339f17cbb1c2ea7ee712cc9b8a/play-services-measurement-api-17.2.2/AndroidManifest.xml:32:17-82
+101            <meta-data
+101-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:32:13-34:85
+102                android:name="com.google.firebase.components:com.google.firebase.iid.Registrar"
+102-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:33:17-96
+103                android:value="com.google.firebase.components.ComponentRegistrar" />
+103-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:34:17-82
+104        </service> <!-- Needs to be explicitly declared on P+ -->
+105        <uses-library
+105-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:33:9-35:40
+106            android:name="org.apache.http.legacy"
+106-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:34:13-50
+107            android:required="false" />
+107-->[com.google.android.gms:play-services-maps:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/699757e170943f1fc18af3734b3f3908/play-services-maps-17.0.0/AndroidManifest.xml:35:13-37
+108
+109        <receiver
+109-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:37:9-44:20
+110            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+110-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:38:13-78
+111            android:exported="true"
+111-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:39:13-36
+112            android:permission="com.google.android.c2dm.permission.SEND" >
+112-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:40:13-73
+113            <intent-filter>
+113-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:41:13-43:29
+114                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+114-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:42:17-81
+114-->[com.google.firebase:firebase-iid:20.0.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/fb238bfa55b16df55d21438e354f4ffe/firebase-iid-20.0.2/AndroidManifest.xml:42:25-78
+115            </intent-filter>
+116        </receiver>
+117
+118        <activity
+118-->[com.google.android.gms:play-services-base:17.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/3979f3ecf01efbeebd0f793d5e106780/play-services-base-17.1.0/AndroidManifest.xml:23:9-26:75
+119            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+119-->[com.google.android.gms:play-services-base:17.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/3979f3ecf01efbeebd0f793d5e106780/play-services-base-17.1.0/AndroidManifest.xml:24:13-79
+120            android:exported="false"
+120-->[com.google.android.gms:play-services-base:17.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/3979f3ecf01efbeebd0f793d5e106780/play-services-base-17.1.0/AndroidManifest.xml:25:13-37
+121            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+121-->[com.google.android.gms:play-services-base:17.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/3979f3ecf01efbeebd0f793d5e106780/play-services-base-17.1.0/AndroidManifest.xml:26:13-72
+122
+123        <provider
+123-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:26:9-30:39
+124            android:name="com.google.firebase.provider.FirebaseInitProvider"
+124-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:27:13-77
+125            android:authorities="com.ceed.tripster.firebaseinitprovider"
+125-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:28:13-72
+126            android:exported="false"
+126-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:29:13-37
+127            android:initOrder="100" />
+127-->[com.google.firebase:firebase-common:19.3.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/a6feca5961b0338d7a44e2ca685c8be8/jetified-firebase-common-19.3.0/AndroidManifest.xml:30:13-36
+128
+129        <receiver
+129-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:29:9-33:20
+130            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
+130-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:30:13-85
+131            android:enabled="true"
+131-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:31:13-35
+132            android:exported="false" >
+132-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:32:13-37
+133        </receiver>
+134        <receiver
+134-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:34:9-42:20
+135            android:name="com.google.android.gms.measurement.AppMeasurementInstallReferrerReceiver"
+135-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:35:13-100
+136            android:enabled="true"
+136-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:36:13-35
+137            android:exported="true"
+137-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:37:13-36
+138            android:permission="android.permission.INSTALL_PACKAGES" >
+138-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:38:13-69
+139            <intent-filter>
+139-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:39:13-41:29
+140                <action android:name="com.android.vending.INSTALL_REFERRER" />
+140-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:40:17-79
+140-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:40:25-76
+141            </intent-filter>
+142        </receiver>
+143
+144        <service
+144-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:44:9-47:40
+145            android:name="com.google.android.gms.measurement.AppMeasurementService"
+145-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:45:13-84
+146            android:enabled="true"
+146-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:46:13-35
+147            android:exported="false" />
+147-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:47:13-37
+148        <service
+148-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:48:9-52:72
+149            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
+149-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:49:13-87
+150            android:enabled="true"
+150-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:50:13-35
+151            android:exported="false"
+151-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:51:13-37
+152            android:permission="android.permission.BIND_JOB_SERVICE" />
+152-->[com.google.android.gms:play-services-measurement:17.2.2] /Users/jair/.gradle/caches/transforms-2/files-2.1/7ccaf229185188f02df33af5c4628aef/play-services-measurement-17.2.2/AndroidManifest.xml:52:13-69
+153
+154        <meta-data
+154-->[com.google.android.gms:play-services-basement:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/4ec87fe1560036f53424d83f7bfe97d0/jetified-play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+155            android:name="com.google.android.gms.version"
+155-->[com.google.android.gms:play-services-basement:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/4ec87fe1560036f53424d83f7bfe97d0/jetified-play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+156            android:value="@integer/google_play_services_version" />
+156-->[com.google.android.gms:play-services-basement:17.0.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/4ec87fe1560036f53424d83f7bfe97d0/jetified-play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+157
+158        <service
+158-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:29:9-35:19
+159            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+159-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:30:13-103
+160            android:exported="false" >
+160-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:31:13-37
+161            <meta-data
+161-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:32:13-34:39
+162                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+162-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:33:17-94
+163                android:value="cct" />
+163-->[com.google.android.datatransport:transport-backend-cct:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/f89dfbe04f664e873991b059db0d6a84/transport-backend-cct-2.1.0/AndroidManifest.xml:34:17-36
+164        </service>
+165        <service
+165-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:26:9-30:19
+166            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+166-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:27:13-117
+167            android:exported="false"
+167-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:28:13-37
+168            android:permission="android.permission.BIND_JOB_SERVICE" >
+168-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:29:13-69
+169        </service>
+170
+171        <receiver
+171-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:32:9-34:40
+172            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+172-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:33:13-132
+173            android:exported="false" />
+173-->[com.google.android.datatransport:transport-runtime:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/873913051a61a5577495ee3c7dea4b35/transport-runtime-2.1.0/AndroidManifest.xml:34:13-37
+174
+175        <provider
+175-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/8684995ff5a18ca00dcf5cdd21201d75/lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
+176            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+176-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/8684995ff5a18ca00dcf5cdd21201d75/lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
+177            android:authorities="com.ceed.tripster.lifecycle-process"
+177-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/8684995ff5a18ca00dcf5cdd21201d75/lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
+178            android:exported="false"
+178-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/8684995ff5a18ca00dcf5cdd21201d75/lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
+179            android:multiprocess="true" />
+179-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/jair/.gradle/caches/transforms-2/files-2.1/8684995ff5a18ca00dcf5cdd21201d75/lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
+180    </application>
+181
+182</manifest>

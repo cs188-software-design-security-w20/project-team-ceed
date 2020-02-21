@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +34,8 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull GalleryPhoto model) {
+        holder._textViewGalleryMessage.setVisibility(View.GONE);
+        notifyDataSetChanged();
         holder.setPhoto(model);
 
         holder.contentView.setOnClickListener(new View.OnClickListener() {
@@ -53,11 +56,13 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
 
         private final ImageView _imageView;
         private GalleryPhoto _photo;
+        private TextView _textViewGalleryMessage;
 
         public ViewHolder(View view) {
             super(view);
             contentView = view;
             _imageView = view.findViewById(R.id.imageView);
+            _textViewGalleryMessage = view.findViewById(R.id.textViewGalleryMessage);
         }
 
         public void setPhoto(GalleryPhoto photo) {
