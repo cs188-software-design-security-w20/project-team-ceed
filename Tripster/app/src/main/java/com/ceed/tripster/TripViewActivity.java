@@ -299,7 +299,7 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
-        Button galleryButton = findViewById(R.id.galleryButton);
+        FloatingActionButton galleryButton = findViewById(R.id.galleryFab);
         galleryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -1,10 +1,11 @@
 .DS_STORE
 Tripster/.gradle
+Tripster/gradle.properties
 Tripster/local.properties
 Tripster/.idea/workspace.xml
 Tripster/.idea/libraries
 Tripster/.idea/caches
 Tripster/.idea/caches/build_file_checksums.ser
 Tripster/.DS_Store
-Tripster/build
+Tripster/app/build
 Tripster/captures
