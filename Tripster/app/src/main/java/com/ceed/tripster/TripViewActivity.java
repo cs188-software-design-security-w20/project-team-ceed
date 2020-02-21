@@ -1,18 +1,11 @@
 package com.ceed.tripster;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +13,13 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
@@ -54,9 +54,9 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -299,6 +299,15 @@ public class TripViewActivity extends FragmentActivity
             }
         });
 
+        Button galleryButton = findViewById(R.id.galleryButton);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(TripViewActivity.this, GalleryActivity.class);
+                myIntent.putExtra("TRIP_ID", _tripId); //Optional parameters
+                TripViewActivity.this.startActivity(myIntent);
+            }
+        });
 
         final FloatingActionButton acceptfab = findViewById(R.id.acceptfab);
         final FloatingActionButton rejectfab = findViewById(R.id.rejectfab);
@@ -495,15 +504,7 @@ public class TripViewActivity extends FragmentActivity
                 }
 
                 _stopInfos.get(key)._marker = marker;
-
-
-
-
             }
-
-
-
-
         }
 
     }
@@ -725,9 +726,5 @@ public class TripViewActivity extends FragmentActivity
                 _communicationCallbacks.onItemClicked(_placeId);
             }
         }
-
-
-
     }
-
 }
