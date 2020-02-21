@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,7 +21,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -40,6 +40,7 @@ public class GalleryActivity extends AppCompatActivity {
     private FirebaseAuth _firebaseAuth;
 
     private GalleryAdapter _adapter;
+    private TextView _textViewGalleryMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class GalleryActivity extends AppCompatActivity {
                         .setQuery(_tripImagesDatabaseRef.orderByChild("uploadTimestamp"), GalleryPhoto.class)
                         .build();
 
-        _adapter = new GalleryAdapter(options);
+        _adapter = new GalleryAdapter(options, findViewById(R.id.textViewGalleryMessage));
 
         galleryRecyclerView.setAdapter(_adapter);
         _adapter.startListening();
@@ -153,10 +154,4 @@ public class GalleryActivity extends AppCompatActivity {
             uploadImage(filePath);
         }
     } // end onActivityResult()
-
-    private void fetchPhotos() {
-        Query query = FirebaseDatabase.getInstance()
-                .getReference()
-                .child("posts");
-    }
 }
