@@ -41,6 +41,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
 
     private DatabaseReference _tripDatabaseReference;
     private DatabaseReference _usersDatabaseReference;
+    private DatabaseReference _userTripsDatabaseReference;
     private List<String> _memberIds;
 
     private RecyclerView _emailList;
@@ -73,6 +74,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
 
         _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripID);
         _usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        _userTripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips");
 
         return view;
     }
@@ -88,7 +90,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
 
                     _memberIds = new ArrayList<String>(((HashMap<String, String>) dataSnapshot.child("memberIds").getValue()).keySet());
                     Log.d("ADDPERSONFRAGMENT", _memberIds.get(0));
-                    _adapter = new EmailListAdapter( _tripDatabaseReference, _usersDatabaseReference, _memberIds);
+                    _adapter = new EmailListAdapter( _tripDatabaseReference, _usersDatabaseReference, _userTripsDatabaseReference, _memberIds, _tripID);
                     _emailList.setAdapter(_adapter);
 
                 }

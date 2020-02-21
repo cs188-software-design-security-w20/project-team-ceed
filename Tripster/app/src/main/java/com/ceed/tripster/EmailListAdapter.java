@@ -1,10 +1,13 @@
 package com.ceed.tripster;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,11 +28,17 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
     private int _itemCount;
     private DatabaseReference _tripDatabaseReference;
     private DatabaseReference _usersDatabaseReference;
+    private DatabaseReference _userTripsDatabaseReference;
+    private String _tripId;
 
-    public EmailListAdapter(DatabaseReference tripDatabaseReference, DatabaseReference usersDatabaseReference, List<String> memberIds){
+    private ImageButton _removeButton;
+
+    public EmailListAdapter(DatabaseReference tripDatabaseReference, DatabaseReference usersDatabaseReference, DatabaseReference userTripsDatabaseReference, List<String> memberIds, String tripId){
         this._tripDatabaseReference = tripDatabaseReference;
         this._usersDatabaseReference = usersDatabaseReference;
+        this._userTripsDatabaseReference = userTripsDatabaseReference;
         this._memberIds = memberIds;
+        this._tripId = tripId;
     }
 
     @Override
@@ -44,34 +53,68 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
         Log.d("EMAILLISTADAPTER", "onCreateViewHolder called");
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.user_email_item, parent, false);
+        _removeButton = v.findViewById(R.id.removeUserButton);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d("EMAILLISTADAPTER", "Email bindviewholder called");
-        _usersDatabaseReference.addValueEventListener(new ValueEventListener() {
+        String memberId = _memberIds.get(position);
+        _removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("EMAILLISTADAPTER", "onDataChange called");
-                if(dataSnapshot.exists()){
-                    Log.d("EMAILLISTADAPTER", "User datasnapshot exists");
-                    String memberId = _memberIds.get(position);
-                    Log.d("EMAILLISTADAPTER", "Member Email1: " + dataSnapshot.child(memberId).child("email").toString());
-                    String memberEmail = dataSnapshot.child(memberId).child("email").getValue().toString();
-                    Log.d("EMAILLISTADAPTER", "Member Email2: " + memberEmail);
-                    holder._textViewUserEmail.setText(memberEmail);
-
-                } else {
-                    holder._textViewUserEmail.setText("dataSnapshot does not exist");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("EMAILLISTADAPTER", databaseError.toString());
+            public void onClick(View v) {
+                _tripDatabaseReference.child("memberIds").child(memberId).removeValue();
+                _memberIds.remove(memberId);
+                _userTripsDatabaseReference.child(memberId).child(_tripId).removeValue();
+                Log.d("EMAILLISTADAPTER", memberId + " removed");
             }
         });
+        if(_memberIds.contains(memberId)) {
+            Log.d("EMAILLISTADAPTER", "_memberIds contains " + memberId);
+            _tripDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists() && _memberIds.contains(memberId)) {
+                        Log.d("EMAILLISTADAPTER", "child(memberIds) contains " + dataSnapshot.child("memberIds").getValue().toString());
+                        Log.d("EMAILLISTADAPTER", "Attempting to access " + memberId);
+                        if (TextUtils.equals(dataSnapshot.child("memberIds").child(memberId).getValue().toString(), "active")
+                                || TextUtils.equals(dataSnapshot.child("memberIds").child(memberId).getValue().toString(), "owner")) {
+                            _usersDatabaseReference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Log.d("EMAILLISTADAPTER", "onDataChange called");
+                                    if (dataSnapshot.exists()) {
+                                        Log.d("EMAILLISTADAPTER", "User datasnapshot exists");
+
+                                        Log.d("EMAILLISTADAPTER", "Member Email1: " + dataSnapshot.child(memberId).child("email").toString());
+                                        String memberEmail = dataSnapshot.child(memberId).child("email").getValue().toString();
+                                        Log.d("EMAILLISTADAPTER", "Member Email2: " + memberEmail);
+                                        holder._textViewUserEmail.setText(memberEmail);
+
+                                    } else {
+                                        holder._textViewUserEmail.setText("dataSnapshot does not exist");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.d("EMAILLISTADAPTER", databaseError.toString());
+                                }
+                            });
+                        } else {
+                            _memberIds.remove(memberId);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.d("EMAILLISTADAPTER", databaseError.toString());
+                }
+            });
+        }
+
     }
 
     @Override
