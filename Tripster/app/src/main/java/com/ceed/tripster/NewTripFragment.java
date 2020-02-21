@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -47,8 +48,8 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
 
     private NavController _navController;
 
-    public NewTripFragment(NavController navController) {
-        this._navController = navController;
+    public NewTripFragment() {
+        //necessary default constructor
     }
 
     @Override
@@ -75,6 +76,7 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         _buttonAddTrip = view.findViewById(R.id.buttonCreateTrip);
         _editTextTripName = view.findViewById(R.id.editTextTripName);
         _buttonAddTrip.setOnClickListener(this);
+        _navController = Navigation.findNavController(view);
 
         if (!Places.isInitialized()) {
             // TODO Secure API key
@@ -188,7 +190,7 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
                                 Toast.LENGTH_SHORT
                             ).show();
                             addTripToUser(userId, newTripId);
-                            TripListFragmentDirections.ActionTripListFragment2ToTripView action = TripListFragmentDirections.actionTripListFragment2ToTripView(newTripId);
+                            NewTripFragmentDirections.ActionNewTripFragmentToTripView action = NewTripFragmentDirections.actionNewTripFragmentToTripView(newTripId);
                             _navController.navigate(action);
                         }
                         else {

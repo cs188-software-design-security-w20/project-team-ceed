@@ -58,7 +58,8 @@
         tools:layout="@layout/fragment_new_trip" >
         <action
             android:id="@+id/action_newTripFragment_to_tripView"
-            app:destination="@id/tripView">
+            app:destination="@id/tripView"
+            app:popUpTo="@id/tripListFragment2">
             <argument
                 android:name="tripID"
                 app:argType="string" />
