@@ -34,6 +34,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/textViewGalleryMessage"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill_horizontal"
+                android:visibility="visible"
+                android:text="Add pictures with the + button below"
+                android:textSize="21sp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="25dp"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/galleryRecyclerView"
                 android:layout_width="match_parent"
