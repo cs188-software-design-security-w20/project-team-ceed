@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,6 +69,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
         _emailList.setLayoutManager(new LinearLayoutManager(_context));
 
 
+
         _tripDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Trips").child(_tripID);
         _usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
         _userTripsDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User Trips");
@@ -86,7 +88,8 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
 
                     _memberIds = new ArrayList<String>(((HashMap<String, String>) dataSnapshot.child("memberIds").getValue()).keySet());
                     Log.d("ADDPERSONFRAGMENT", _memberIds.get(0));
-                    _adapter = new EmailListAdapter( _tripDatabaseReference, _usersDatabaseReference, _userTripsDatabaseReference, _memberIds, _tripID);
+                    _adapter = new EmailListAdapter( _tripDatabaseReference, _usersDatabaseReference,
+                            _userTripsDatabaseReference, _memberIds, _tripID, getActivity(), FirebaseAuth.getInstance());
                     _emailList.setAdapter(_adapter);
 
                 }

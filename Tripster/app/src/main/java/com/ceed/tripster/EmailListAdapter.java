@@ -1,6 +1,7 @@
 package com.ceed.tripster;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,17 +29,21 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
     private DatabaseReference _tripDatabaseReference;
     private DatabaseReference _usersDatabaseReference;
     private DatabaseReference _userTripsDatabaseReference;
+    private FirebaseAuth _auth;
     private String _tripId;
+    private Activity _activity;
 
 
     private ImageButton _removeButton;
 
-    public EmailListAdapter(DatabaseReference tripDatabaseReference, DatabaseReference usersDatabaseReference, DatabaseReference userTripsDatabaseReference, List<String> memberIds, String tripId){
+    public EmailListAdapter(DatabaseReference tripDatabaseReference, DatabaseReference usersDatabaseReference, DatabaseReference userTripsDatabaseReference, List<String> memberIds, String tripId, Activity activity, FirebaseAuth auth){
         this._tripDatabaseReference = tripDatabaseReference;
         this._usersDatabaseReference = usersDatabaseReference;
         this._userTripsDatabaseReference = userTripsDatabaseReference;
         this._memberIds = memberIds;
         this._tripId = tripId;
+        _activity = activity;
+        _auth = auth;
     }
 
     @Override
@@ -66,6 +72,9 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
                 _tripDatabaseReference.child("memberIds").child(memberId).removeValue();
                 _memberIds.remove(memberId);
                 _userTripsDatabaseReference.child(memberId).child(_tripId).removeValue();
+                if (memberId.equals(_auth.getUid())) {
+                    _activity.finish();
+                }
                 Log.d("EMAILLISTADAPTER", memberId + " removed");
             }
         });
