@@ -21,19 +21,19 @@
             android:id="@+id/currTripTab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Current Trips"/>
+            android:text="Current"/>
 
         <com.google.android.material.tabs.TabItem
         android:id="@+id/pastTripTab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Past Trips"/>
+        android:text="Past"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/pendingTripTab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Trip Requests"/>
+            android:text="Requests"/>
 
     </com.google.android.material.tabs.TabLayout>
 
