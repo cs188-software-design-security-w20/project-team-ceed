@@ -62,10 +62,6 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_new_trip, container, false);
     }
@@ -88,12 +84,11 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment startAutocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.enter_start_autocomplete_fragment);
+        startAutocompleteFragment.setHint("Enter your starting location");
 
         // Specify the types of place data to return.
         startAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
                 Place.Field.LAT_LNG, Place.Field.ADDRESS));
-
-
 
         // Set up a PlaceSelectionListener to handle the response.
         startAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -114,13 +109,11 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment endAutocompleteFragment = (AutocompleteSupportFragment)
                 getChildFragmentManager().findFragmentById(R.id.enter_end_autocomplete_fragment);
+        endAutocompleteFragment.setHint("Enter your destination");
 
         // Specify the types of place data to return.
         endAutocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME,
                 Place.Field.LAT_LNG, Place.Field.ADDRESS));
-
-
-        Place end_place;
 
 
         // Set up a PlaceSelectionListener to handle the response.
