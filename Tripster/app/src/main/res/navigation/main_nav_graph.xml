@@ -48,14 +48,22 @@
         <action
             android:id="@+id/action_tripListFragment2_to_newTripFragment"
             app:destination="@id/newTripFragment" />
-        <argument
-            android:name="tripId"
-            app:argType="string" />
+
 
     </fragment>
     <fragment
         android:id="@+id/newTripFragment"
         android:name="com.ceed.tripster.NewTripFragment"
         android:label="fragment_new_trip"
-        tools:layout="@layout/fragment_new_trip" />
+        tools:layout="@layout/fragment_new_trip" >
+        <action
+            android:id="@+id/action_newTripFragment_to_tripView"
+            app:destination="@id/tripView">
+            <argument
+                android:name="tripID"
+                app:argType="string" />
+        </action>
+
+
+    </fragment>
 </navigation>

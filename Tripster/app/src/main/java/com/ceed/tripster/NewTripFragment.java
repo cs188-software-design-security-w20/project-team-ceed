@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,8 +45,10 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
     private Place _startPlace;
     private Place _endPlace;
 
-    public NewTripFragment() {
-        // Required empty public constructor
+    private NavController _navController;
+
+    public NewTripFragment(NavController navController) {
+        this._navController = navController;
     }
 
     @Override
@@ -139,6 +142,7 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         if (view == _buttonAddTrip && checkCreateTripFields()) {
             writeTripToDatabase();
+
         }
     }
 
@@ -184,6 +188,8 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
                                 Toast.LENGTH_SHORT
                             ).show();
                             addTripToUser(userId, newTripId);
+                            TripListFragmentDirections.ActionTripListFragment2ToTripView action = TripListFragmentDirections.actionTripListFragment2ToTripView(newTripId);
+                            _navController.navigate(action);
                         }
                         else {
                             Toast.makeText(
