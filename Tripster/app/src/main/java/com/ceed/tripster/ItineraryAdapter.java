@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActivity.StopsViewHolder> {
@@ -28,20 +29,22 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
 
     public interface CommunicationCallbacks {
         void onStopDeleted(String placeId);
+
         void onItemClicked(String placeId);
+
         boolean isTripActive();
+
         void setRating(String placeId, Double rating);
+
         String getDuration(String placeId);
     }
 
     private CommunicationCallbacks _communicationCallbacks;
 
 
-
-
     public ItineraryAdapter(FirebaseRecyclerOptions<Stop> options,
                             DatabaseReference tripStopsDatabaseReference, PlacesClient placesClient,
-                            CommunicationCallbacks communicationCallbacks){
+                            CommunicationCallbacks communicationCallbacks) {
         super(options);
 
         this._tripStopsDatabaseReference = tripStopsDatabaseReference;
@@ -50,11 +53,10 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
     }
 
 
-
     @Override
     protected void onBindViewHolder(@NonNull final TripViewActivity.StopsViewHolder holder, int position, @NonNull Stop model) {
         final String listStopId = getRef(position).getKey();
-        Log.d("Firebase", "ID: "+ listStopId);
+        Log.d("Firebase", "ID: " + listStopId);
         _tripStopsDatabaseReference.orderByChild("index").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -68,55 +70,57 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                     holder._placeId = listStopId;
                     holder._textViewDuration.setText(_communicationCallbacks.getDuration(listStopId));
 
-                    if(type.equals("start")) {
+                    if (type.equals("start")) {
                         holder._textViewDuration.setVisibility(View.GONE);
                     }
 
-                    if(!_communicationCallbacks.isTripActive()) {
-                        holder._imageButton.setVisibility(View.GONE);
+                    holder._imageButton.setVisibility(
+                            _communicationCallbacks.isTripActive() ? View.VISIBLE : View.GONE);
+
+                    if (holder._textViewRating.getText().equals("Rating") ||
+                            holder._textViewRating.getVisibility() == View.GONE) {
+                        List<Place.Field> placeFields = Collections.singletonList(Place.Field.RATING);
+
+                        // Construct a request object, passing the place ID and fields array.
+                        FetchPlaceRequest request = FetchPlaceRequest.newInstance(listStopId, placeFields);
+
+                        _placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                            Place place = response.getPlace();
+                            Log.v("rating", place.getRating() + "");
+                            if (place.getRating() != null) {
+                                _communicationCallbacks.setRating(listStopId, place.getRating());
+                                holder._textViewRating.setText("Rating: " + place.getRating());
+                            } else {
+                                holder._textViewRating.setVisibility(View.GONE);
+                            }
+
+                        }).addOnFailureListener((exception) -> {
+                            if (exception instanceof ApiException) {
+                                ApiException apiException = (ApiException) exception;
+                                int statusCode = apiException.getStatusCode();
+                                // Handle error with given status code.
+                                Log.e("ERROR", "Place not found: " + exception.getMessage());
+                            }
+                        });
+
+
                     }
-
-                    List<Place.Field> placeFields = Arrays.asList(Place.Field.RATING);
-
-                    // Construct a request object, passing the place ID and fields array.
-                    FetchPlaceRequest request = FetchPlaceRequest.newInstance(listStopId, placeFields);
-
-                    _placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                        Place place = response.getPlace();
-                        Log.v("rating", place.getRating() + "");
-                        if (place.getRating() != null) {
-                            _communicationCallbacks.setRating(listStopId, place.getRating());
-                            holder._textViewRating.setText("Rating: " + place.getRating());
-                        } else {
-                            holder._textViewRating.setVisibility(View.GONE);
-                        }
-
-                    }).addOnFailureListener((exception) -> {
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            int statusCode = apiException.getStatusCode();
-                            // Handle error with given status code.
-                            Log.e("ERROR", "Place not found: " + exception.getMessage());
-                        }
-                    });
-
 
                     if (TextUtils.equals(type, "start")) {
                         holder._textViewStopType.setText("Start Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
                         holder._imageButton.setVisibility(View.GONE);
-                    }
-                    else if (TextUtils.equals(type, "end")) {
+                    } else if (TextUtils.equals(type, "end")) {
                         holder._textViewStopType.setText("End Stop");
                         holder._textViewStopType.setVisibility(View.VISIBLE);
                         holder._imageButton.setVisibility(View.GONE);
                     } else {
                         holder._textViewStopType.setText("");
                         holder._textViewStopType.setVisibility(View.GONE);
-                        holder._imageButton.setVisibility(View.VISIBLE);
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d("Firebase", databaseError.getMessage());

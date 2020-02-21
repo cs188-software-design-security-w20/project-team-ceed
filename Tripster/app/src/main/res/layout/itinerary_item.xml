@@ -95,6 +95,7 @@
         android:layout_marginRight="8dp"
         android:scaleX=".75"
         android:scaleY=".75"
+        android:visibility="gone"
         android:background="@android:color/white"
         />
 
