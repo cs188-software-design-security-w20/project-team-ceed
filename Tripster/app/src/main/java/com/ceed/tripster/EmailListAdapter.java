@@ -1,5 +1,6 @@
 package com.ceed.tripster;
 
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,18 +19,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.ViewHolder> {
 
     private List<String> _memberIds;
-    private int _itemCount;
     private DatabaseReference _tripDatabaseReference;
     private DatabaseReference _usersDatabaseReference;
     private DatabaseReference _userTripsDatabaseReference;
     private String _tripId;
+
 
     private ImageButton _removeButton;
 

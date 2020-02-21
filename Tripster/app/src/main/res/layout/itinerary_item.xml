@@ -12,7 +12,6 @@
         android:layout_margin="15dp"
         android:id="@+id/horizontal_layout"
         android:orientation="horizontal"
-        android:clickable="true"
         >
 
 
@@ -43,6 +42,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Address"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:maxWidth="305dp"
+                />
+
+            <TextView
+                android:id="@+id/textViewRating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rating"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                />
+
+            <TextView
+                android:id="@+id/textViewDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duration"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
                 />
@@ -77,6 +95,7 @@
         android:layout_marginRight="8dp"
         android:scaleX=".75"
         android:scaleY=".75"
+        android:visibility="gone"
         android:background="@android:color/white"
         />
 
