@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginBottom="10dp"
+    >
 
     <TextView
         android:id="@+id/textViewUserEmail"
@@ -18,7 +23,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="1dp"
-        app:srcCompat="@drawable/quantum_ic_clear_grey600_24" />
+        android:scaleX=".66"
+        android:scaleY=".66"
+        android:layout_marginTop="-4dp"
+        android:background="@android:color/white"
+        android:src="@drawable/ic_remove_circle_outline_black_36dp" />
+</LinearLayout>
 
 
-</RelativeLayout>
+
