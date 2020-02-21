@@ -2,6 +2,7 @@ package com.ceed.tripster;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -80,7 +81,7 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
 
         if (!Places.isInitialized()) {
             // TODO Secure API key
-            Places.initialize(_context.getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
+            Places.initialize(_context.getApplicationContext(), BuildConfig.Google_Maps_Key);
         }
 
 

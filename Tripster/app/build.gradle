@@ -17,9 +17,17 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField "String", "reCaptcha_Site_Key", reCAPTCHA_SITE_KEY
+            buildConfigField "String", "reCaptcha_Secret_Key", reCAPTCHA_SECRET_KEY
+            buildConfigField "String", "Google_Maps_Key", GOOGLE_MAPS_KEY
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "reCaptcha_Site_Key", reCAPTCHA_SITE_KEY
+            buildConfigField "String", "reCaptcha_Secret_Key", reCAPTCHA_SECRET_KEY
+            buildConfigField "String", "Google_Maps_Key", GOOGLE_MAPS_KEY
         }
     }
     apply plugin: "androidx.navigation.safeargs"
