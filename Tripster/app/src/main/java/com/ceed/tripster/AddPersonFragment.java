@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class addPersonFragment extends DialogFragment implements View.OnClickListener {
+public class AddPersonFragment extends DialogFragment implements View.OnClickListener {
 
     private Context _context;
     private Button _submit;
@@ -44,7 +44,7 @@ public class addPersonFragment extends DialogFragment implements View.OnClickLis
     private RecyclerView _emailList;
     private View _emailListView;
 
-    public addPersonFragment(String tripID){
+    public AddPersonFragment(String tripID){
         this._tripID = tripID;
     }
 
