@@ -174,7 +174,7 @@ public class TripViewActivity extends FragmentActivity
         });
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk");
+            Places.initialize(getApplicationContext(), BuildConfig.Google_Maps_Key);
         }
 
 
@@ -229,7 +229,7 @@ public class TripViewActivity extends FragmentActivity
 
        if (_geoApiContext == null) {
            _geoApiContext =
-                   new GeoApiContext.Builder().apiKey("AIzaSyCCuUByT1YxzVcehC492h1oYERb59Nuswk").build();
+                   new GeoApiContext.Builder().apiKey(BuildConfig.Google_Maps_Key).build();
        }
 
         _databaseRoot = FirebaseDatabase.getInstance().getReference();

@@ -40,7 +40,6 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     private EditText _editTextPasswordLogIn;
     private TextView _textViewRegister;
 
-    private String captchaSiteKey = "6Le8z9UUAAAAALkZDnjTgDn7Hcxw8xvuPSHmj97W";
     private Integer MAX_TRIES = 3;
     private Integer _attempts = 0;
 
@@ -99,7 +98,7 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
     }
 
     private void captcha() {
-        SafetyNet.getClient(_context).verifyWithRecaptcha(captchaSiteKey)
+        SafetyNet.getClient(_context).verifyWithRecaptcha(BuildConfig.reCaptcha_Site_Key)
                 .addOnSuccessListener((Activity) _context,
                         new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
                             @Override
