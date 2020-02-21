@@ -20,8 +20,11 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, GalleryAdapter.ViewHolder> {
-    public GalleryAdapter(FirebaseRecyclerOptions<GalleryPhoto> options) {
+    private TextView _noPhotoTextView;
+
+    public GalleryAdapter(FirebaseRecyclerOptions<GalleryPhoto> options, TextView noPhotoTextView) {
         super(options);
+        _noPhotoTextView = noPhotoTextView;
     }
 
 
@@ -34,8 +37,7 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull GalleryPhoto model) {
-        holder._textViewGalleryMessage.setVisibility(View.GONE);
-        notifyDataSetChanged();
+        _noPhotoTextView.setVisibility(View.GONE);
         holder.setPhoto(model);
 
         holder.contentView.setOnClickListener(new View.OnClickListener() {
@@ -56,13 +58,11 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
 
         private final ImageView _imageView;
         private GalleryPhoto _photo;
-        private TextView _textViewGalleryMessage;
 
         public ViewHolder(View view) {
             super(view);
             contentView = view;
             _imageView = view.findViewById(R.id.imageView);
-            _textViewGalleryMessage = view.findViewById(R.id.textViewGalleryMessage);
         }
 
         public void setPhoto(GalleryPhoto photo) {
