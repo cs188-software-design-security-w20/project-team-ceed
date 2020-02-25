@@ -109,8 +109,8 @@ public class LogInFragment extends Fragment implements View.OnClickListener {
                                 if (!userResponseToken.isEmpty()) {
                                     // Validate the user response token using the
                                     // reCAPTCHA siteverify API.
+                                    logIn();
                                 }
-                                logIn();
                             }
                         })
                 .addOnFailureListener((Activity) _context, new OnFailureListener() {

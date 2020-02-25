@@ -1,7 +1,6 @@
 package com.ceed.tripster;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,6 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
     @Override
     protected void onBindViewHolder(@NonNull final TripListFragment.TripsViewHolder holder, int position, @NonNull UserTrip model) {
         final String listTripId = getRef(position).getKey();
-        Log.d("Firebase", "ID: "+ listTripId);
         DatabaseReference getStateRef = getRef(position).child("state").getRef();
         getStateRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -58,12 +56,10 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Log.d("Firebase", "Error: " + databaseError.getMessage());
                             }
                         });
                     }
                     else {
-                        Log.d("Debug", "Making the holder gone");
                         holder._layoutTripListItem.setVisibility(View.GONE);
                         holder._layoutTripListItem.getChildAt(0).setVisibility(View.GONE);
                     }
@@ -79,7 +75,6 @@ public class TripListAdapter extends FirebaseRecyclerAdapter<UserTrip, TripListF
         holder._layoutTripListItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("TripList", "onClick: " + holder._tripID);
                 TripListFragmentDirections.ActionTripListFragment2ToTripView action = TripListFragmentDirections.actionTripListFragment2ToTripView(holder._tripID);
                 _navController.navigate(action);
             }

@@ -1,7 +1,6 @@
 package com.ceed.tripster;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,6 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
     @Override
     protected void onBindViewHolder(@NonNull final TripViewActivity.StopsViewHolder holder, int position, @NonNull Stop model) {
         final String listStopId = getRef(position).getKey();
-        Log.d("Firebase", "ID: " + listStopId);
         _tripStopsDatabaseReference.orderByChild("index").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -86,7 +84,6 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
 
                         _placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
                             Place place = response.getPlace();
-                            Log.v("rating", place.getRating() + "");
                             if (place.getRating() != null) {
                                 _communicationCallbacks.setRating(listStopId, place.getRating());
                                 holder._textViewRating.setText("Rating: " + place.getRating());
@@ -99,7 +96,6 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
                                 ApiException apiException = (ApiException) exception;
                                 int statusCode = apiException.getStatusCode();
                                 // Handle error with given status code.
-                                Log.e("ERROR", "Place not found: " + exception.getMessage());
                             }
                         });
 
@@ -123,7 +119,6 @@ public class ItineraryAdapter extends FirebaseRecyclerAdapter<Stop, TripViewActi
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("Firebase", databaseError.getMessage());
             }
         });
     }

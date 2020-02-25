@@ -2,7 +2,6 @@ package com.ceed.tripster;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,17 +93,14 @@ public class TripListFragment extends Fragment{
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab == _tabLayout.getTabAt(0)){
-                    Log.d("TripList Fragment", "currTripTab clicked");
                     _adapter.set_tabState("active");
                     _adapter.notifyDataSetChanged();
 
                 } else if (tab == _tabLayout.getTabAt(1)) {
-                    Log.d("TripList Fragment", "pastTripTab clicked");
                     _adapter.set_tabState("inactive");
                     _adapter.notifyDataSetChanged();
 
                 } else if (tab == _tabLayout.getTabAt(2)) {
-                    Log.d("TripList Fragment", "pendingTripTab clicked");
                     _adapter.set_tabState("pending");
                     _adapter.notifyDataSetChanged();
 

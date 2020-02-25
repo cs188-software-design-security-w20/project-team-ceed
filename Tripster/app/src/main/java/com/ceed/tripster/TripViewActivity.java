@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -173,12 +172,6 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onCallback(Trip dataItem) {
                 // TODO: Do stuff with the trip
-                Log.d("Trip info", dataItem.getName());
-                Log.d("Trip info", dataItem.getStart());
-                Log.d("Trip info", dataItem.getDestination());
-                Log.d("Trip info", dataItem.getStops().toString());
-                // Log.d("Trip info", dataItem.getMemberIds().toString());
-
 
                 _map.clear();
                 setStops(dataItem.getStops());
@@ -258,7 +251,6 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onError(Status status) {
                 // TODO: Handle the error.
-                Log.i("TAG", "An error occurred: " + status);
             }
         });
 
@@ -266,7 +258,6 @@ public class TripViewActivity extends FragmentActivity
         searchCard.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Do something in response to button click
-                Log.d("tag", "Close");
                 _bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             }
@@ -414,7 +405,6 @@ public class TripViewActivity extends FragmentActivity
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("Firebase", databaseError.getMessage());
             }
         };
 
@@ -433,7 +423,6 @@ public class TripViewActivity extends FragmentActivity
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("Firebase", databaseError.getMessage());
             }
         };
 
@@ -531,7 +520,6 @@ public class TripViewActivity extends FragmentActivity
             ArrayList<com.google.maps.model.LatLng> wayPoints = new ArrayList<>();
             for (String key : _stopInfos.keySet()) {
                 StopInfo info = _stopInfos.get(key);
-                Log.v("info", info._type + ", " + info._wayPoint);
                 if (info._type.equals("stop")) {
                     wayPoints.add(info._wayPoint);
                 }
@@ -594,14 +582,11 @@ public class TripViewActivity extends FragmentActivity
 
             @Override
             public void onFailure(Throwable e) {
-                Log.e("boo", "calculateDirections: Failed to get directions: " + e.getMessage());
-
             }
         });
     }
 
     public void addUserToTrip(String email) {
-        Log.d("TRIPVIEWACTIVITY", email);
         String adjustedEmail = email.replaceAll("\\.", ",");
 
         ValueEventListener listener = _databaseRoot.child("User Email to UID").child(adjustedEmail).addValueEventListener(new ValueEventListener() {

@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +86,6 @@ public class AddPersonFragment extends DialogFragment implements View.OnClickLis
                 if(dataSnapshot.exists() && dataSnapshot.child("memberIds").getValue() != null){
 
                     _memberIds = new ArrayList<String>(((HashMap<String, String>) dataSnapshot.child("memberIds").getValue()).keySet());
-                    Log.d("ADDPERSONFRAGMENT", _memberIds.get(0));
                     _adapter = new EmailListAdapter( _tripDatabaseReference, _usersDatabaseReference,
                             _userTripsDatabaseReference, _memberIds, _tripID, getActivity(), FirebaseAuth.getInstance());
                     _emailList.setAdapter(_adapter);
@@ -105,7 +103,6 @@ public class AddPersonFragment extends DialogFragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        Log.d("ADDPERSONFRAGMENT", v.toString());
         if (v.getId() == R.id.submit) {
             String email = emailField.getText().toString();
             ((TripViewActivity) getActivity()).addUserToTrip(email);

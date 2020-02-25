@@ -4,7 +4,6 @@ package com.ceed.tripster;
 import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +54,6 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("EMAILLISTADAPTER", "onCreateViewHolder called");
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.user_email_item, parent, false);
         _removeButton = v.findViewById(R.id.removeUserButton);
@@ -64,7 +62,6 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d("EMAILLISTADAPTER", "Email bindviewholder called");
         String memberId = _memberIds.get(position);
         _removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,29 +72,20 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
                 if (memberId.equals(_auth.getUid())) {
                     _activity.finish();
                 }
-                Log.d("EMAILLISTADAPTER", memberId + " removed");
             }
         });
         if(_memberIds.contains(memberId)) {
-            Log.d("EMAILLISTADAPTER", "_memberIds contains " + memberId);
             _tripDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists() && _memberIds.contains(memberId)) {
-                        Log.d("EMAILLISTADAPTER", "child(memberIds) contains " + dataSnapshot.child("memberIds").getValue().toString());
-                        Log.d("EMAILLISTADAPTER", "Attempting to access " + memberId);
                         if (TextUtils.equals(dataSnapshot.child("memberIds").child(memberId).getValue().toString(), "active")
                                 || TextUtils.equals(dataSnapshot.child("memberIds").child(memberId).getValue().toString(), "owner")) {
                             _usersDatabaseReference.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Log.d("EMAILLISTADAPTER", "onDataChange called");
                                     if (dataSnapshot.exists()) {
-                                        Log.d("EMAILLISTADAPTER", "User datasnapshot exists");
-
-                                        Log.d("EMAILLISTADAPTER", "Member Email1: " + dataSnapshot.child(memberId).child("email").toString());
                                         String memberEmail = dataSnapshot.child(memberId).child("email").getValue().toString();
-                                        Log.d("EMAILLISTADAPTER", "Member Email2: " + memberEmail);
                                         holder._textViewUserEmail.setText(memberEmail);
 
                                     } else {
@@ -107,7 +95,6 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    Log.d("EMAILLISTADAPTER", databaseError.toString());
                                 }
                             });
                         } else {
@@ -118,7 +105,6 @@ public class EmailListAdapter extends RecyclerView.Adapter<EmailListAdapter.View
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.d("EMAILLISTADAPTER", databaseError.toString());
                 }
             });
         }

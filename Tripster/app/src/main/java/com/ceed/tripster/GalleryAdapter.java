@@ -3,7 +3,6 @@ package com.ceed.tripster;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,6 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
         holder.contentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("GALLERYADAPTER", "clicked gallery photo");
 //                if (mListener != null) {
 //                    // Notify the active callbacks interface (the activity, if the
 //                    // fragment is attached to one) that an item has been selected.
@@ -66,7 +64,6 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
         }
 
         public void setPhoto(GalleryPhoto photo) {
-            Log.d("GALLERYADAPTER", "Loading image with url " + photo.imageUrl);
 
             _photo = photo;
             new DownloadImageTask(_imageView).execute(photo.imageUrl);
@@ -91,8 +88,6 @@ public class GalleryAdapter extends FirebaseRecyclerAdapter<GalleryPhoto, Galler
                     InputStream in = new java.net.URL(urldisplay).openStream();
                     mIcon11 = BitmapFactory.decodeStream(in);
                 } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                    e.printStackTrace();
                 }
                 return mIcon11;
             }

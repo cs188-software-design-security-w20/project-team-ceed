@@ -10,7 +10,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +89,6 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == _buttonRegister) {
-            Log.d("SIGNUP", "Button clicked");
             //_navController.navigate(R.id.action_signUpFragment_to_mainActivity);
             registerUser();
         } else if (view == _textViewLogin) {
@@ -174,10 +172,8 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Log.d("Firebase", "Successfully set display name");
                     }
                     else {
-                        Log.d("Firebase", "Failed to set display name");
                     }
                 }
             });
@@ -195,7 +191,6 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
         userMap.put("email", email);
         userMap.put("display_name", displayName);
         userMap.put("profile_photo", "");
-        Log.d("Debug", userMap.toString());
         return userMap;
     }
 
@@ -204,10 +199,8 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d("Firebase", "Successfully deleted user" + user.getUid());
                 }
                 else {
-                    Log.d("Firebase", "Failed to delete user" + user.getUid());
                 }
             }
         });
@@ -219,11 +212,9 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d("Firebase", "Successfully wrote user " + userId + " to database");
                     // Write user email to mapping
                     writeUserEmailToDatabase(replacePeriodsFromEmail(userMap.get("email")), user);
                 } else {
-                    Log.d("Firebase", "Failed to write user " + userId + " to database");
                     deleteCurrentUser(user);
                 }
             }
@@ -236,11 +227,9 @@ public class SignUpFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d("Firebase", "Successfully wrote user email " + email + " to mapping");
                     // Navigate to main page
                     _navController.navigate(R.id.action_signUpFragment_to_mainActivity);
                 } else {
-                    Log.d("Firebase", "Failed to write user email " + email + " to mapping");
                     deleteCurrentUser(user);
                 }
             }

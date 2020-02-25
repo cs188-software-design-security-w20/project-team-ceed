@@ -11,7 +11,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,13 +95,11 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
             public void onPlaceSelected(@NonNull Place place) {
                 setStartPlace(place);
                 // TODO: Get info about the selected place.
-                Log.i("Places Autocomplete", "Place: " + place.getName() + ", " + place.getId());
             }
 
             @Override
             public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
-                Log.i("Places Autocomplete", "An error occurred: " + status);
             }
         });
 
@@ -121,15 +118,12 @@ public class NewTripFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 setEndPlace(place);
-
                 // TODO: Get info about the selected place.
-                Log.i("Places Autocomplete", "Place: " + place.getName() + ", " + place.getId());
             }
 
             @Override
             public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
-                Log.i("Places Autocomplete", "An error occurred: " + status);
             }
         });
     }

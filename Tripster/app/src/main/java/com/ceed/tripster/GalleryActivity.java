@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,7 +98,6 @@ public class GalleryActivity extends AppCompatActivity {
         String uploadedFilename = UUID.randomUUID().toString();
 
         StorageReference storageFileRef = _tripImageStorageRef.child(uploadedFilename);
-        Log.d("GALLERYACTIVITY", "uploadImage: " + uploadedFilename);
         storageFileRef.putFile(filePath)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
