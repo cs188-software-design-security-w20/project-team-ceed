@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -285,8 +286,13 @@ public class TripViewActivity extends FragmentActivity
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getSupportFragmentManager();
-                AddPersonFragment p_fragment = new AddPersonFragment(_tripId);
-                p_fragment.show(manager, "AddPersonFragment");
+                Fragment frag = manager.findFragmentByTag("fragment_add_people");
+                if (frag != null) {
+                    manager.beginTransaction().remove(frag).commit();
+                }
+
+                AddPeopleFragment p_fragment = new AddPeopleFragment(_tripId);
+                p_fragment.show(manager, "fragment_add_people");
             }
         });
 

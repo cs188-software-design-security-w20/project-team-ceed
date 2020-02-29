@@ -2,19 +2,18 @@ package com.ceed.tripster;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class AddPersonFragment extends DialogFragment implements View.OnClickListener {
+public class AddPeopleFragment extends DialogFragment implements View.OnClickListener {
 
     private Context _context;
     private Button _submit;
@@ -44,7 +43,7 @@ public class AddPersonFragment extends DialogFragment implements View.OnClickLis
     private RecyclerView _emailList;
     private View _emailListView;
 
-    public AddPersonFragment(String tripID){
+    public AddPeopleFragment(String tripID){
         this._tripID = tripID;
     }
 
